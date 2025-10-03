@@ -41,18 +41,18 @@ import 'package:tuw_services/widgets/title_widget.dart';
 import 'package:tuw_services/widgets/top_logo.dart';
 
 class UserAddressEdit extends StatefulWidget {
- final bool isUpdate;
+  final bool isUpdate;
   final String? lat;
   final String? lot;
-final  XFile? imageFile;
-final  String? defaultReg;
- final String? defRegion;
-final String? selectedvalue;
- final bool locUpdate;
-final  int? countryid;
-final  int? defaultregid;
-final  int? stateid;
- const  UserAddressEdit(
+  final XFile? imageFile;
+  final String? defaultReg;
+  final String? defRegion;
+  final String? selectedvalue;
+  final bool locUpdate;
+  final int? countryid;
+  final int? defaultregid;
+  final int? stateid;
+  const UserAddressEdit(
       {super.key,
       this.isUpdate = false,
       this.lat,
@@ -206,35 +206,42 @@ class _UserAddressEditState extends State<UserAddressEdit> {
                   ),
                   GButton(
                     icon: FontAwesomeIcons.message,
-                    leading: Stack(
-                      children: [InkWell(
+                    leading: Stack(children: [
+                      InkWell(
                         child: SizedBox(
                             width: 24,
                             height: 24,
                             child: SvgPicture.asset(ImageAssets.chatIconSvg)),
-         
-             ),  Positioned(
-        right: 0,top: 0,
-        child: new Container(
-          padding: EdgeInsets.all(1),
-          decoration: new BoxDecoration(
-            color: Colors.red,
-            borderRadius: BorderRadius.circular(6),
-          ),
-          constraints: BoxConstraints(
-            minWidth: 15,
-            minHeight: 15,
-          ),
-          child: Text(provider.chatListDetails!.chatMessage!.data!.isNotEmpty? 
-              provider.chatListDetails!.chatMessage!.data![0].unreadCount.toString()
-             :'0', style: new TextStyle(
-              color: Colors.white,
-              fontSize: 11,
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ),
-      ) ]),
+                      ),
+                      Positioned(
+                        right: 0,
+                        top: 0,
+                        child: new Container(
+                          padding: EdgeInsets.all(1),
+                          decoration: new BoxDecoration(
+                            color: Colors.red,
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          constraints: BoxConstraints(
+                            minWidth: 15,
+                            minHeight: 15,
+                          ),
+                          child: Text(
+                            provider.chatListDetails!.chatMessage!.data!
+                                    .isNotEmpty
+                                ? provider.chatListDetails!.chatMessage!
+                                    .data![0].unreadCount
+                                    .toString()
+                                : '0',
+                            style: new TextStyle(
+                              color: Colors.white,
+                              fontSize: 11,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      )
+                    ]),
                   ),
                 ],
                 haptic: true,
@@ -656,10 +663,12 @@ class _UserAddressEditState extends State<UserAddressEdit> {
                                     child: DropdownButtonHideUnderline(
                                       child: DropdownButton2<Countries>(
                                           isExpanded: true,
-                                          icon: const Icon(
-                                            Icons.keyboard_arrow_down,
-                                            size: 35,
-                                            color: ColorManager.black,
+                                          iconStyleData: const IconStyleData(
+                                            icon: Icon(
+                                              Icons.keyboard_arrow_down,
+                                              size: 35,
+                                              color: ColorManager.black,
+                                            ),
                                           ),
                                           hint: Text(str.ae_country_h,
                                               style: getRegularStyle(
@@ -744,47 +753,63 @@ class _UserAddressEditState extends State<UserAddressEdit> {
                                             provider.clearStates();
                                             setState(() {});
                                           },
-                                          buttonHeight: 40,
-                                          dropdownMaxHeight: size.height * .6,
-                                          // buttonWidth: 140,
-                                          itemHeight: 40,
-                                          buttonPadding:
-                                              const EdgeInsets.fromLTRB(
-                                                  12, 0, 8, 0),
-                                          // dropdownWidth: size.width,
-                                          itemPadding:
-                                              const EdgeInsets.fromLTRB(
-                                                  12, 0, 12, 0),
-                                          searchController:
-                                              AddressEditControllers
-                                                  .searchController,
-                                          searchInnerWidgetHeight: 50,
-                                          searchInnerWidget: Padding(
-                                            padding: const EdgeInsets.only(
-                                              top: 8,
-                                              bottom: 4,
-                                              right: 8,
-                                              left: 8,
-                                            ),
-                                            child: TextFormField(
-                                              controller: AddressEditControllers
-                                                  .searchController,
-                                              decoration: InputDecoration(
-                                                isDense: true,
-                                                contentPadding:
-                                                    const EdgeInsets.symmetric(
-                                                  horizontal: 10,
-                                                  vertical: 8,
-                                                ),
-                                                hintText: str.s_search_country,
-                                                hintStyle: const TextStyle(
-                                                    fontSize: 12),
-                                                border: OutlineInputBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(8),
+                                          buttonStyleData: ButtonStyleData(
+                                            height: 40,
+                                            padding: const EdgeInsets.fromLTRB(
+                                                12, 0, 8, 0),
+                                          ),
+                                          dropdownStyleData: DropdownStyleData(
+                                            maxHeight: size.height * .6,
+                                          ),
+                                          menuItemStyleData:
+                                              const MenuItemStyleData(
+                                            height: 40,
+                                            padding: EdgeInsets.fromLTRB(
+                                                12, 0, 12, 0),
+                                          ),
+                                          dropdownSearchData:
+                                              DropdownSearchData(
+                                            searchController:
+                                                AddressEditControllers
+                                                    .searchController,
+                                            searchInnerWidgetHeight: 50,
+                                            searchInnerWidget: Padding(
+                                              padding: const EdgeInsets.only(
+                                                top: 8,
+                                                bottom: 4,
+                                                right: 8,
+                                                left: 8,
+                                              ),
+                                              child: TextFormField(
+                                                controller:
+                                                    AddressEditControllers
+                                                        .searchController,
+                                                decoration: InputDecoration(
+                                                  isDense: true,
+                                                  contentPadding:
+                                                      const EdgeInsets
+                                                          .symmetric(
+                                                    horizontal: 10,
+                                                    vertical: 8,
+                                                  ),
+                                                  hintText:
+                                                      str.s_search_country,
+                                                  hintStyle: const TextStyle(
+                                                      fontSize: 12),
+                                                  border: OutlineInputBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            8),
+                                                  ),
                                                 ),
                                               ),
                                             ),
+                                            searchMatchFn: (item, searchValue) {
+                                              return (item.value!.countryName
+                                                  .toString()
+                                                  .toLowerCase()
+                                                  .contains(searchValue));
+                                            },
                                           ),
                                           customButton: selectedValue == null
                                               ? null
@@ -794,7 +819,7 @@ class _UserAddressEditState extends State<UserAddressEdit> {
                                                       child: Padding(
                                                         padding:
                                                             const EdgeInsets
-                                                                    .fromLTRB(
+                                                                .fromLTRB(
                                                                 10, 0, 10, 0),
                                                         child: Text(
                                                             selectedValue ??
@@ -803,12 +828,6 @@ class _UserAddressEditState extends State<UserAddressEdit> {
                                                     ),
                                                   ],
                                                 ),
-                                          searchMatchFn: (item, searchValue) {
-                                            return (item.value!.countryName
-                                                .toString()
-                                                .toLowerCase()
-                                                .contains(searchValue));
-                                          },
                                           //This to clear the search value when you close the menu
                                           onMenuStateChange: (isOpen) {
                                             if (!isOpen) {
@@ -850,10 +869,12 @@ class _UserAddressEditState extends State<UserAddressEdit> {
                                           child: DropdownButton2<Regions>(
                                             isExpanded: true,
                                             // focusNode: nfocus,
-                                            icon: const Icon(
-                                              Icons.keyboard_arrow_down,
-                                              size: 35,
-                                              color: ColorManager.black,
+                                            iconStyleData: const IconStyleData(
+                                              icon: Icon(
+                                                Icons.keyboard_arrow_down,
+                                                size: 35,
+                                                color: ColorManager.black,
+                                              ),
                                             ),
                                             hint: Text(str.p_region_h,
                                                 style: getRegularStyle(
@@ -894,17 +915,22 @@ class _UserAddressEditState extends State<UserAddressEdit> {
                                               setState(() {});
                                               // s(selectedValue);
                                             },
-                                            buttonHeight: 50,
-                                            dropdownMaxHeight: size.height * .6,
-                                            // buttonWidth: 140,
-                                            itemHeight: 40,
-                                            buttonPadding:
-                                                const EdgeInsets.fromLTRB(
-                                                    12, 0, 8, 0),
-                                            // dropdownWidth: size.width,
-                                            itemPadding:
-                                                const EdgeInsets.fromLTRB(
-                                                    12, 0, 12, 0),
+                                            buttonStyleData: ButtonStyleData(
+                                              height: 50,
+                                              padding:
+                                                  const EdgeInsets.fromLTRB(
+                                                      12, 0, 8, 0),
+                                            ),
+                                            dropdownStyleData:
+                                                DropdownStyleData(
+                                              maxHeight: size.height * .6,
+                                            ),
+                                            menuItemStyleData:
+                                                const MenuItemStyleData(
+                                              height: 40,
+                                              padding: EdgeInsets.fromLTRB(
+                                                  12, 0, 12, 0),
+                                            ),
                                             // searchController:
                                             //     AddressEditControllers
                                             //         .searchController,
@@ -928,7 +954,7 @@ class _UserAddressEditState extends State<UserAddressEdit> {
                                             //         horizontal: 10,
                                             //         vertical: 8,
                                             //       ),
-                                             //       hintText:
+                                            //       hintText:
                                             //           str.s_search_country,
                                             //       hintStyle:
                                             //           const TextStyle(
@@ -957,11 +983,8 @@ class _UserAddressEditState extends State<UserAddressEdit> {
                                                         child: Padding(
                                                           padding:
                                                               const EdgeInsets
-                                                                      .fromLTRB(
-                                                                  10,
-                                                                  15,
-                                                                  10,
-                                                                  15),
+                                                                  .fromLTRB(10,
+                                                                  15, 10, 15),
                                                           child: Text(
                                                               defaultReg ?? '',
                                                               style: getRegularStyle(
@@ -1050,10 +1073,13 @@ class _UserAddressEditState extends State<UserAddressEdit> {
                                             child: DropdownButton2<States>(
                                               isExpanded: true,
                                               // focusNode: nfocus,
-                                              icon: const Icon(
-                                                Icons.keyboard_arrow_down,
-                                                size: 35,
-                                                color: ColorManager.black,
+                                              iconStyleData:
+                                                  const IconStyleData(
+                                                icon: Icon(
+                                                  Icons.keyboard_arrow_down,
+                                                  size: 35,
+                                                  color: ColorManager.black,
+                                                ),
                                               ),
                                               hint: provider.stateinfomodel
                                                               ?.result ==
@@ -1100,18 +1126,22 @@ class _UserAddressEditState extends State<UserAddressEdit> {
                                                     .text = defRegion ?? '';
                                                 // s(selectedValue);
                                               },
-                                              buttonHeight: 50,
-                                              dropdownMaxHeight:
-                                                  size.height * .6,
-                                              // buttonWidth: 140,
-                                              itemHeight: 40,
-                                              buttonPadding:
-                                                  const EdgeInsets.fromLTRB(
-                                                      12, 0, 8, 0),
-                                              // dropdownWidth: size.width,
-                                              itemPadding:
-                                                  const EdgeInsets.fromLTRB(
-                                                      12, 0, 12, 0),
+                                              buttonStyleData: ButtonStyleData(
+                                                height: 50,
+                                                padding:
+                                                    const EdgeInsets.fromLTRB(
+                                                        12, 0, 8, 0),
+                                              ),
+                                              dropdownStyleData:
+                                                  DropdownStyleData(
+                                                maxHeight: size.height * .6,
+                                              ),
+                                              menuItemStyleData:
+                                                  const MenuItemStyleData(
+                                                height: 40,
+                                                padding: EdgeInsets.fromLTRB(
+                                                    12, 0, 12, 0),
+                                              ),
                                               // searchController:
                                               //     AddressEditControllers
                                               //         .searchController,
@@ -1135,7 +1165,7 @@ class _UserAddressEditState extends State<UserAddressEdit> {
                                               //         horizontal: 10,
                                               //         vertical: 8,
                                               //       ),
-                                               //       hintText:
+                                              //       hintText:
                                               //           str.s_search_country,
                                               //       hintStyle:
                                               //           const TextStyle(
@@ -1166,11 +1196,8 @@ class _UserAddressEditState extends State<UserAddressEdit> {
                                                         Padding(
                                                           padding:
                                                               const EdgeInsets
-                                                                      .fromLTRB(
-                                                                  10,
-                                                                  15,
-                                                                  10,
-                                                                  15),
+                                                                  .fromLTRB(10,
+                                                                  15, 10, 15),
                                                           child: Text(
                                                               defRegion ?? '',
                                                               style: getRegularStyle(

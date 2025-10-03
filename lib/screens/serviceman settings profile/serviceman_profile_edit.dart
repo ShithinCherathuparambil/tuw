@@ -508,24 +508,24 @@ class _ServiceManProfileEditPageState extends State<ServiceManProfileEditPage> {
                                                   // ),
                                                   hint: Text(str.ae_country_h,
                                                       style: getRegularStyle(
-                                                          color: const Color.fromARGB(
-                                                              255,
-                                                              173,
-                                                              173,
-                                                              173),
+                                                          color: const Color
+                                                              .fromARGB(255,
+                                                              173, 173, 173),
                                                           fontSize: 15)),
                                                   items: r3
-                                                      .map((item) =>
-                                                          DropdownMenuItem<
-                                                              String>(
-                                                            value: item,
-                                                            child: Text(item,
-                                                                style: getRegularStyle(
-                                                                    color: ColorManager
-                                                                        .black,
-                                                                    fontSize:
-                                                                        15)),
-                                                          ))
+                                                      .map(
+                                                          (item) =>
+                                                              DropdownMenuItem<
+                                                                  String>(
+                                                                value: item,
+                                                                child: Text(
+                                                                    item,
+                                                                    style: getRegularStyle(
+                                                                        color: ColorManager
+                                                                            .black,
+                                                                        fontSize:
+                                                                            15)),
+                                                              ))
                                                       .toList(),
                                                   // value: selectedCountry,
                                                   onChanged: (value) {
@@ -551,55 +551,72 @@ class _ServiceManProfileEditPageState extends State<ServiceManProfileEditPage> {
                                                     provider.clearStates();
                                                     setState(() {});
                                                   },
-                                                  buttonHeight: 40,
-                                                  dropdownMaxHeight:
-                                                      size.height * .6,
-                                                  // buttonWidth: 140,
-                                                  itemHeight: 40,
-                                                  buttonPadding:
-                                                      const EdgeInsets.fromLTRB(
-                                                          12, 0, 8, 0),
-                                                  // dropdownWidth: size.width,
-                                                  itemPadding:
-                                                      const EdgeInsets.fromLTRB(
-                                                          12, 0, 12, 0),
-                                                  searchController:
-                                                      ServiceManProfileEdit
-                                                          .searchController,
-                                                  searchInnerWidget: Padding(
+                                                  buttonStyleData:
+                                                      ButtonStyleData(
+                                                    height: 40,
+                                                    padding: const EdgeInsets
+                                                        .fromLTRB(12, 0, 8, 0),
+                                                  ),
+                                                  dropdownStyleData:
+                                                      DropdownStyleData(
+                                                    maxHeight: size.height * .6,
+                                                  ),
+                                                  menuItemStyleData:
+                                                      const MenuItemStyleData(
+                                                    height: 40,
                                                     padding:
-                                                        const EdgeInsets.only(
-                                                      top: 8,
-                                                      bottom: 4,
-                                                      right: 8,
-                                                      left: 8,
-                                                    ),
-                                                    child: TextFormField(
-                                                      controller:
-                                                          ServiceManProfileEdit
-                                                              .searchController,
-                                                      decoration:
-                                                          InputDecoration(
-                                                        isDense: true,
-                                                        contentPadding:
-                                                            const EdgeInsets
-                                                                .symmetric(
-                                                          horizontal: 10,
-                                                          vertical: 8,
-                                                        ),
-                                                         hintText: str
-                                                            .s_search_country,
-                                                        hintStyle:
-                                                            const TextStyle(
-                                                                fontSize: 12),
-                                                        border:
-                                                            OutlineInputBorder(
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(8),
+                                                        EdgeInsets.fromLTRB(
+                                                            12, 0, 12, 0),
+                                                  ),
+                                                  dropdownSearchData:
+                                                      DropdownSearchData(
+                                                    searchController:
+                                                        ServiceManProfileEdit
+                                                            .searchController,
+                                                    searchInnerWidget: Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                        top: 8,
+                                                        bottom: 4,
+                                                        right: 8,
+                                                        left: 8,
+                                                      ),
+                                                      child: TextFormField(
+                                                        controller:
+                                                            ServiceManProfileEdit
+                                                                .searchController,
+                                                        decoration:
+                                                            InputDecoration(
+                                                          isDense: true,
+                                                          contentPadding:
+                                                              const EdgeInsets
+                                                                  .symmetric(
+                                                            horizontal: 10,
+                                                            vertical: 8,
+                                                          ),
+                                                          hintText: str
+                                                              .s_search_country,
+                                                          hintStyle:
+                                                              const TextStyle(
+                                                                  fontSize: 12),
+                                                          border:
+                                                              OutlineInputBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        8),
+                                                          ),
                                                         ),
                                                       ),
                                                     ),
+                                                    searchMatchFn:
+                                                        (item, searchValue) {
+                                                      return (item.value
+                                                          .toString()
+                                                          .toLowerCase()
+                                                          .contains(
+                                                              searchValue));
+                                                    },
                                                   ),
                                                   customButton:
                                                       selectedCountry == null
@@ -610,7 +627,8 @@ class _ServiceManProfileEditPageState extends State<ServiceManProfileEditPage> {
                                                                   child:
                                                                       Padding(
                                                                     padding:
-                                                                        const EdgeInsets.fromLTRB(
+                                                                        const EdgeInsets
+                                                                            .fromLTRB(
                                                                             10,
                                                                             0,
                                                                             10,
@@ -622,13 +640,6 @@ class _ServiceManProfileEditPageState extends State<ServiceManProfileEditPage> {
                                                                 ),
                                                               ],
                                                             ),
-                                                  searchMatchFn:
-                                                      (item, searchValue) {
-                                                    return (item.value
-                                                        .toString()
-                                                        .toLowerCase()
-                                                        .contains(searchValue));
-                                                  },
                                                   //This to clear the search value when you close the menu
                                                   onMenuStateChange: (isOpen) {
                                                     if (!isOpen) {
@@ -748,18 +759,22 @@ class _ServiceManProfileEditPageState extends State<ServiceManProfileEditPage> {
                                                     context, regid);
                                                 setState(() {});
                                               },
-                                              buttonHeight: 50,
-                                              dropdownMaxHeight:
-                                                  size.height * .6,
-                                              // buttonWidth: 140,
-                                              itemHeight: 40,
-                                              buttonPadding:
-                                                  const EdgeInsets.fromLTRB(
-                                                      12, 0, 8, 0),
-                                              // dropdownWidth: size.width,
-                                              itemPadding:
-                                                  const EdgeInsets.fromLTRB(
-                                                      12, 0, 12, 0),
+                                              buttonStyleData: ButtonStyleData(
+                                                height: 50,
+                                                padding:
+                                                    const EdgeInsets.fromLTRB(
+                                                        12, 0, 8, 0),
+                                              ),
+                                              dropdownStyleData:
+                                                  DropdownStyleData(
+                                                maxHeight: size.height * .6,
+                                              ),
+                                              menuItemStyleData:
+                                                  const MenuItemStyleData(
+                                                height: 40,
+                                                padding: EdgeInsets.fromLTRB(
+                                                    12, 0, 12, 0),
+                                              ),
                                               // searchController:
                                               //     AddressEditControllers
                                               //         .searchController,
@@ -783,7 +798,7 @@ class _ServiceManProfileEditPageState extends State<ServiceManProfileEditPage> {
                                               //         horizontal: 10,
                                               //         vertical: 8,
                                               //       ),
-                                               //       hintText:
+                                              //       hintText:
                                               //           str.s_search_country,
                                               //       hintStyle:
                                               //           const TextStyle(
@@ -814,11 +829,8 @@ class _ServiceManProfileEditPageState extends State<ServiceManProfileEditPage> {
                                                         Padding(
                                                           padding:
                                                               const EdgeInsets
-                                                                      .fromLTRB(
-                                                                  10,
-                                                                  15,
-                                                                  10,
-                                                                  15),
+                                                                  .fromLTRB(10,
+                                                                  15, 10, 15),
                                                           child: Text(
                                                               defaultReg ?? '',
                                                               style: getRegularStyle(
@@ -945,18 +957,22 @@ class _ServiceManProfileEditPageState extends State<ServiceManProfileEditPage> {
                                                     .text = defState ?? '';
                                                 // s(selectedValue);
                                               },
-                                              buttonHeight: 50,
-                                              dropdownMaxHeight:
-                                                  size.height * .6,
-                                              // buttonWidth: 140,
-                                              itemHeight: 40,
-                                              buttonPadding:
-                                                  const EdgeInsets.fromLTRB(
-                                                      12, 0, 8, 0),
-                                              // dropdownWidth: size.width,
-                                              itemPadding:
-                                                  const EdgeInsets.fromLTRB(
-                                                      12, 0, 12, 0),
+                                              buttonStyleData: ButtonStyleData(
+                                                height: 50,
+                                                padding:
+                                                    const EdgeInsets.fromLTRB(
+                                                        12, 0, 8, 0),
+                                              ),
+                                              dropdownStyleData:
+                                                  DropdownStyleData(
+                                                maxHeight: size.height * .6,
+                                              ),
+                                              menuItemStyleData:
+                                                  const MenuItemStyleData(
+                                                height: 40,
+                                                padding: EdgeInsets.fromLTRB(
+                                                    12, 0, 12, 0),
+                                              ),
                                               // searchController:
                                               //     AddressEditControllers
                                               //         .searchController,
@@ -980,7 +996,7 @@ class _ServiceManProfileEditPageState extends State<ServiceManProfileEditPage> {
                                               //         horizontal: 10,
                                               //         vertical: 8,
                                               //       ),
-                                               //       hintText:
+                                              //       hintText:
                                               //           str.s_search_country,
                                               //       hintStyle:
                                               //           const TextStyle(
@@ -1011,11 +1027,8 @@ class _ServiceManProfileEditPageState extends State<ServiceManProfileEditPage> {
                                                         Padding(
                                                           padding:
                                                               const EdgeInsets
-                                                                      .fromLTRB(
-                                                                  10,
-                                                                  15,
-                                                                  10,
-                                                                  15),
+                                                                  .fromLTRB(10,
+                                                                  15, 10, 15),
                                                           child: Text(
                                                               defState ?? '',
                                                               style: getRegularStyle(
@@ -1139,7 +1152,7 @@ class _ServiceManProfileEditPageState extends State<ServiceManProfileEditPage> {
                                             builder: (context) =>
                                                 PageView.builder(
                                                   itemCount:
-                                                      galleryImages.length  ,
+                                                      galleryImages.length,
                                                   itemBuilder:
                                                       (context, index) {
                                                     return PopupImage(
@@ -1384,46 +1397,49 @@ class _ServiceManProfileEditPageState extends State<ServiceManProfileEditPage> {
                                 });
                                 print(value);
                               },
-                              icon: const Icon(
-                                Icons.arrow_forward_ios_outlined,
+                              iconStyleData: const IconStyleData(
+                                icon: Icon(Icons.arrow_forward_ios_outlined),
+                                iconSize: 14,
+                                iconEnabledColor: ColorManager.primary,
+                                iconDisabledColor: Colors.grey,
                               ),
-                              iconSize: 14,
-                              iconEnabledColor: ColorManager.primary,
-                              iconDisabledColor: Colors.grey,
-                              buttonHeight: 40,
-                              buttonWidth: size.width * .5,
-                              buttonPadding:
-                                  const EdgeInsets.only(left: 14, right: 14),
-                              buttonDecoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(4),
-                                boxShadow: [
-                                  BoxShadow(
-                                    blurRadius: 10.0,
-                                    color: Colors.grey.shade300,
-                                    offset: const Offset(5, 8.5),
-                                  ),
-                                ],
-                                // border: Border.all(
-                                //   color: Colors.black26,
-                                // ),
-                                color: ColorManager.whiteColor,
+                              buttonStyleData: ButtonStyleData(
+                                height: 40,
+                                width: size.width * .5,
+                                padding:
+                                    const EdgeInsets.only(left: 14, right: 14),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(4),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      blurRadius: 10.0,
+                                      color: Colors.grey.shade300,
+                                      offset: const Offset(5, 8.5),
+                                    ),
+                                  ],
+                                  color: ColorManager.whiteColor,
+                                ),
                               ),
-                              // buttonElevation: 2,
-                              itemHeight: 40,
-                              itemPadding:
-                                  const EdgeInsets.only(left: 14, right: 14),
-                              dropdownMaxHeight: 200,
-                              dropdownWidth: size.width * .5,
-                              dropdownPadding: null,
-                              dropdownDecoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(14),
-                                color: ColorManager.background,
+                              menuItemStyleData: const MenuItemStyleData(
+                                height: 40,
+                                padding: EdgeInsets.only(left: 14, right: 14),
                               ),
-                              dropdownElevation: 8,
-                              scrollbarRadius: const Radius.circular(40),
-                              scrollbarThickness: 6,
-                              scrollbarAlwaysShow: true,
-                              // offset: const Offset(-20, 0),
+                              dropdownStyleData: DropdownStyleData(
+                                maxHeight: 200,
+                                width: size.width * .5,
+                                padding: null,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(14),
+                                  color: ColorManager.background,
+                                ),
+                                elevation: 8,
+                                scrollbarTheme: ScrollbarThemeData(
+                                  radius: const Radius.circular(40),
+                                  thickness: WidgetStateProperty.all(6),
+                                  thumbVisibility:
+                                      WidgetStateProperty.all(true),
+                                ),
+                              ),
                             ),
                           ),
                         ],

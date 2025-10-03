@@ -54,7 +54,7 @@ class _ChooseMoreServicePageState extends State<ChooseMoreServicePage> {
   String lang = '';
   List<Services> sGroup = [];
   List<Childservices> childGroup = [];
- 
+
   @override
   void initState() {
     super.initState();
@@ -84,7 +84,7 @@ class _ChooseMoreServicePageState extends State<ChooseMoreServicePage> {
 
       setState(() {});
       // getCustomerChild(context);
-         provider.customerChildSer?.documents?.clear();
+      provider.customerChildSer?.documents?.clear();
     });
   }
 
@@ -271,10 +271,12 @@ class _ChooseMoreServicePageState extends State<ChooseMoreServicePage> {
                                       const EdgeInsets.fromLTRB(0, 10, 0, 10),
                                   child: DropdownButtonHideUnderline(
                                     child: DropdownButton2(
-                                      icon: const Icon(
-                                        Icons.keyboard_arrow_down,
-                                        size: 35,
-                                        color: ColorManager.black,
+                                      iconStyleData: const IconStyleData(
+                                        icon: Icon(
+                                          Icons.keyboard_arrow_down,
+                                          size: 35,
+                                          color: ColorManager.black,
+                                        ),
                                       ),
                                       hint: Text(str.c_service_group_h,
                                           style: getRegularStyle(
@@ -318,14 +320,17 @@ class _ChooseMoreServicePageState extends State<ChooseMoreServicePage> {
                                               .childservices!.isNotEmpty;
                                         });
                                       },
-                                      buttonHeight: 40,
-                                      // buttonWidth: 140,
-                                      itemHeight: 40,
-                                      buttonPadding: const EdgeInsets.fromLTRB(
-                                          12, 0, 8, 0),
-                                      // dropdownWidth: size.width,
-                                      itemPadding: const EdgeInsets.fromLTRB(
-                                          12, 0, 12, 0),
+                                      buttonStyleData: ButtonStyleData(
+                                        height: 40,
+                                        padding: const EdgeInsets.fromLTRB(
+                                            12, 0, 8, 0),
+                                      ),
+                                      menuItemStyleData:
+                                          const MenuItemStyleData(
+                                        height: 40,
+                                        padding:
+                                            EdgeInsets.fromLTRB(12, 0, 12, 0),
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -385,20 +390,22 @@ class _ChooseMoreServicePageState extends State<ChooseMoreServicePage> {
                                                 child:
                                                     DropdownButtonHideUnderline(
                                                   child: DropdownButton2(
-                                                    icon: const Icon(
-                                                      Icons.keyboard_arrow_down,
-                                                      size: 35,
-                                                      color: ColorManager.black,
+                                                    iconStyleData:
+                                                        const IconStyleData(
+                                                      icon: Icon(
+                                                        Icons
+                                                            .keyboard_arrow_down,
+                                                        size: 35,
+                                                        color:
+                                                            ColorManager.black,
+                                                      ),
                                                     ),
                                                     hint: Text(
                                                         str.c_service_list_h1,
                                                         style: getRegularStyle(
                                                             color: const Color
-                                                                    .fromARGB(
-                                                                255,
-                                                                173,
-                                                                173,
-                                                                173),
+                                                                .fromARGB(255,
+                                                                173, 173, 173),
                                                             fontSize: 15)),
                                                     items: childGroup
                                                         .map((item) =>
@@ -438,7 +445,7 @@ class _ChooseMoreServicePageState extends State<ChooseMoreServicePage> {
                                                             : Padding(
                                                                 padding:
                                                                     const EdgeInsets
-                                                                            .fromLTRB(
+                                                                        .fromLTRB(
                                                                         10,
                                                                         5,
                                                                         10,
@@ -448,18 +455,20 @@ class _ChooseMoreServicePageState extends State<ChooseMoreServicePage> {
                                                                             ?.serviceName ??
                                                                         'null'),
                                                               ),
-                                                    buttonHeight: 40,
-                                                    // buttonWidth: 140,
-                                                    itemHeight: 40,
-                                                    buttonPadding:
-                                                        const EdgeInsets
-                                                                .fromLTRB(
-                                                            12, 0, 8, 0),
-                                                    // dropdownWidth: size.width,
-                                                    itemPadding:
-                                                        const EdgeInsets
-                                                                .fromLTRB(
-                                                            12, 0, 12, 0),
+                                                    buttonStyleData:
+                                                        ButtonStyleData(
+                                                      height: 40,
+                                                      padding: const EdgeInsets
+                                                          .fromLTRB(
+                                                          12, 0, 8, 0),
+                                                    ),
+                                                    menuItemStyleData:
+                                                        const MenuItemStyleData(
+                                                      height: 40,
+                                                      padding:
+                                                          EdgeInsets.fromLTRB(
+                                                              12, 0, 12, 0),
+                                                    ),
                                                   ),
                                                 ),
                                               ),

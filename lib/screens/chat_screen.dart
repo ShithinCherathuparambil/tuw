@@ -48,8 +48,8 @@ import 'package:video_compress/video_compress.dart';
 // import 'package:video_compress/video_compress.dart' as video_compress;
 
 class ChatScreen extends StatefulWidget {
- final Serviceman? serviceman;
- const ChatScreen({super.key, this.serviceman});
+  final Serviceman? serviceman;
+  const ChatScreen({super.key, this.serviceman});
 
   @override
   State<ChatScreen> createState() => _ChatScreenState();
@@ -79,7 +79,7 @@ class _ChatScreenState extends State<ChatScreen> {
   final StopWatchTimer _stopWatchTimer = StopWatchTimer(
     mode: StopWatchMode.countUp,
   );
-  final recorder = Record();
+  final recorder = AudioRecorder();
 
   Future<void> record() async {
     final dir = await getTemporaryDirectory();
@@ -87,8 +87,8 @@ class _ChatScreenState extends State<ChatScreen> {
 
     await initRecorder();
     await recorder.start(
+      const RecordConfig(encoder: AudioEncoder.aacLc),
       path: path,
-      encoder: AudioEncoder.aacLc,
     );
   }
 
@@ -1123,8 +1123,8 @@ class _ChatScreenState extends State<ChatScreen> {
               child: BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
                 child: Container(
-                  color:
-                      Colors.black.withOpacity(0.3), // Adjust opacity as needed
+                  color: Colors.black
+                      .withValues(alpha: 0.3), // Adjust opacity as needed
                 ),
               ),
             ),

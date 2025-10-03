@@ -259,10 +259,12 @@ class _ChooseServicePageState extends State<ChooseServicePage> {
                                       const EdgeInsets.fromLTRB(0, 10, 0, 10),
                                   child: DropdownButtonHideUnderline(
                                     child: DropdownButton2(
-                                      icon: const Icon(
-                                        Icons.keyboard_arrow_down,
-                                        size: 35,
-                                        color: ColorManager.black,
+                                      iconStyleData: const IconStyleData(
+                                        icon: Icon(
+                                          Icons.keyboard_arrow_down,
+                                          size: 35,
+                                          color: ColorManager.black,
+                                        ),
                                       ),
                                       hint: Text(str.c_service_group_h,
                                           style: getRegularStyle(
@@ -306,14 +308,17 @@ class _ChooseServicePageState extends State<ChooseServicePage> {
                                               .childservices!.isNotEmpty;
                                         });
                                       },
-                                      buttonHeight: 40,
-                                      // buttonWidth: 140,
-                                      itemHeight: 40,
-                                      buttonPadding: const EdgeInsets.fromLTRB(
-                                          12, 0, 8, 0),
-                                      // dropdownWidth: size.width,
-                                      itemPadding: const EdgeInsets.fromLTRB(
-                                          12, 0, 12, 0),
+                                      buttonStyleData: ButtonStyleData(
+                                        height: 40,
+                                        padding: const EdgeInsets.fromLTRB(
+                                            12, 0, 8, 0),
+                                      ),
+                                      menuItemStyleData:
+                                          const MenuItemStyleData(
+                                        height: 40,
+                                        padding:
+                                            EdgeInsets.fromLTRB(12, 0, 12, 0),
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -373,20 +378,22 @@ class _ChooseServicePageState extends State<ChooseServicePage> {
                                                 child:
                                                     DropdownButtonHideUnderline(
                                                   child: DropdownButton2(
-                                                    icon: const Icon(
-                                                      Icons.keyboard_arrow_down,
-                                                      size: 35,
-                                                      color: ColorManager.black,
+                                                    iconStyleData:
+                                                        const IconStyleData(
+                                                      icon: Icon(
+                                                        Icons
+                                                            .keyboard_arrow_down,
+                                                        size: 35,
+                                                        color:
+                                                            ColorManager.black,
+                                                      ),
                                                     ),
                                                     hint: Text(
                                                         str.c_service_list_h1,
                                                         style: getRegularStyle(
                                                             color: const Color
-                                                                    .fromARGB(
-                                                                255,
-                                                                173,
-                                                                173,
-                                                                173),
+                                                                .fromARGB(255,
+                                                                173, 173, 173),
                                                             fontSize: 15)),
                                                     items: childGroup
                                                         .map((item) =>
@@ -426,7 +433,7 @@ class _ChooseServicePageState extends State<ChooseServicePage> {
                                                             : Padding(
                                                                 padding:
                                                                     const EdgeInsets
-                                                                            .fromLTRB(
+                                                                        .fromLTRB(
                                                                         10,
                                                                         10,
                                                                         10,
@@ -436,18 +443,20 @@ class _ChooseServicePageState extends State<ChooseServicePage> {
                                                                             ?.serviceName ??
                                                                         ''),
                                                               ),
-                                                    buttonHeight: 40,
-                                                    // buttonWidth: 140,
-                                                    itemHeight: 40,
-                                                    buttonPadding:
-                                                        const EdgeInsets
-                                                                .fromLTRB(
-                                                            12, 0, 8, 0),
-                                                    // dropdownWidth: size.width,
-                                                    itemPadding:
-                                                        const EdgeInsets
-                                                                .fromLTRB(
-                                                            12, 0, 12, 0),
+                                                    buttonStyleData:
+                                                        ButtonStyleData(
+                                                      height: 40,
+                                                      padding: const EdgeInsets
+                                                          .fromLTRB(
+                                                          12, 0, 8, 0),
+                                                    ),
+                                                    menuItemStyleData:
+                                                        const MenuItemStyleData(
+                                                      height: 40,
+                                                      padding:
+                                                          EdgeInsets.fromLTRB(
+                                                              12, 0, 12, 0),
+                                                    ),
                                                   ),
                                                 ),
                                               ),

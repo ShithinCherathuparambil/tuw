@@ -8,7 +8,7 @@ import 'package:tuw_services/screens/Become%20a%20servie%20man/choose_service_pa
 import 'package:tuw_services/screens/home_page.dart';
 import 'package:tuw_services/screens/introduction_screen.dart';
 import 'package:tuw_services/screens/mobile_number_screen.dart';
- import 'package:tuw_services/screens/privacy_policy.dart';
+import 'package:tuw_services/screens/privacy_policy.dart';
 import 'package:tuw_services/screens/profile_page.dart';
 import 'package:tuw_services/screens/Become%20a%20servie%20man/profile_service_man.dart';
 import 'package:tuw_services/screens/serviceman/servicer.dart';

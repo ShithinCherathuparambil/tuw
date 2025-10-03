@@ -152,9 +152,10 @@ class _ProfileDetailsPageState extends State<EditProfileScreen> {
     final mobWth = ResponsiveWidth.isMobile(context);
     final smobWth = ResponsiveWidth.issMobile(context);
     final provider = Provider.of<DataProvider>(context, listen: true);
-List<States> states = provider.stateinfomodel?.states??[];
-states.add(States(cityId: 0 , createdAt: '' , id: 0 ,stateName: 'atT' ,  updatedAt: ''));
-log('states -> ${states.map((e) => e.stateName)}');
+    List<States> states = provider.stateinfomodel?.states ?? [];
+    states.add(States(
+        cityId: 0, createdAt: '', id: 0, stateName: 'atT', updatedAt: ''));
+    log('states -> ${states.map((e) => e.stateName)}');
     return Scaffold(
       drawerEnableOpenDragGesture: false,
       endDrawer: SizedBox(
@@ -421,8 +422,7 @@ log('states -> ${states.map((e) => e.stateName)}');
                                   ),
                                 ),
 
-
- Padding(
+                                Padding(
                                   padding:
                                       const EdgeInsets.fromLTRB(0, 10, 0, 0),
                                   child: TitleWidget(name: str.p_email_h),
@@ -601,14 +601,16 @@ log('states -> ${states.map((e) => e.stateName)}');
                                             0, 10, 0, 10),
                                         child: DropdownButtonHideUnderline(
                                           child: DropdownButton2(
-                                              searchInnerWidgetHeight: 56, // Add this line
                                               isExpanded: true,
                                               focusNode: nfocus,
                                               // customItemsHeights: [],
-                                              icon: const Icon(
-                                                Icons.keyboard_arrow_down,
-                                                size: 35,
-                                                color: ColorManager.black,
+                                              iconStyleData:
+                                                  const IconStyleData(
+                                                icon: Icon(
+                                                  Icons.keyboard_arrow_down,
+                                                  size: 35,
+                                                  color: ColorManager.black,
+                                                ),
                                               ),
                                               hint: Text(str.ae_country_h,
                                                   style: getRegularStyle(
@@ -654,57 +656,69 @@ log('states -> ${states.map((e) => e.stateName)}');
                                                   stateid = null;
                                                 });
                                               },
-                                              buttonHeight: 40,
-                                              dropdownMaxHeight: h * .6,
-                                              // buttonWidth: 140,
-                                              itemHeight: 40,
-                                              buttonPadding:
-                                                  const EdgeInsets.fromLTRB(
-                                                      12, 0, 8, 0),
-                                              // dropdownWidth: size.width,
-                                              itemPadding: const EdgeInsets
-                                                  .fromLTRB(12, 0, 12, 0),
-                                              searchController:
-                                                  AddressEditControllers
-                                                      .searchController,
-                                              searchInnerWidget: Padding(
-                                                padding: const EdgeInsets.only(
-                                                  top: 8,
-                                                  bottom: 4,
-                                                  right: 8,
-                                                  left: 8,
-                                                ),
-                                                child: TextFormField(
-                                                  controller:
-                                                      AddressEditControllers
-                                                          .searchController,
-                                                  decoration: InputDecoration(
-                                                    isDense: true,
-                                                    contentPadding:
-                                                        const EdgeInsets
-                                                            .symmetric(
-                                                      horizontal: 10,
-                                                      vertical: 8,
-                                                    ),
-                                                    hintText:
-                                                        str.s_search_country,
-                                                    hintStyle: const TextStyle(
-                                                        fontSize: 12),
-                                                    border: OutlineInputBorder(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              8),
+                                              buttonStyleData: ButtonStyleData(
+                                                height: 40,
+                                                padding:
+                                                    const EdgeInsets.fromLTRB(
+                                                        12, 0, 8, 0),
+                                              ),
+                                              dropdownStyleData:
+                                                  DropdownStyleData(
+                                                maxHeight: h * .6,
+                                              ),
+                                              menuItemStyleData:
+                                                  const MenuItemStyleData(
+                                                height: 40,
+                                                padding: EdgeInsets.fromLTRB(
+                                                    12, 0, 12, 0),
+                                              ),
+                                              dropdownSearchData:
+                                                  DropdownSearchData(
+                                                searchController:
+                                                    AddressEditControllers
+                                                        .searchController,
+                                                searchInnerWidget: Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                    top: 8,
+                                                    bottom: 4,
+                                                    right: 8,
+                                                    left: 8,
+                                                  ),
+                                                  child: TextFormField(
+                                                    controller:
+                                                        AddressEditControllers
+                                                            .searchController,
+                                                    decoration: InputDecoration(
+                                                      isDense: true,
+                                                      contentPadding:
+                                                          const EdgeInsets
+                                                              .symmetric(
+                                                        horizontal: 10,
+                                                        vertical: 8,
+                                                      ),
+                                                      hintText:
+                                                          str.s_search_country,
+                                                      hintStyle:
+                                                          const TextStyle(
+                                                              fontSize: 12),
+                                                      border:
+                                                          OutlineInputBorder(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(8),
+                                                      ),
                                                     ),
                                                   ),
                                                 ),
+                                                searchMatchFn:
+                                                    (item, searchValue) {
+                                                  return (item.value
+                                                      .toString()
+                                                      .toLowerCase()
+                                                      .contains(searchValue));
+                                                },
                                               ),
-                                              searchMatchFn:
-                                                  (item, searchValue) {
-                                                return (item.value
-                                                    .toString()
-                                                    .toLowerCase()
-                                                    .contains(searchValue));
-                                              },
                                               //This to clear the search value when you close the menu
                                               onMenuStateChange: (isOpen) {
                                                 if (!isOpen) {
@@ -769,12 +783,16 @@ log('states -> ${states.map((e) => e.stateName)}');
                                               child: DropdownButton2<Regions>(
                                                 isExpanded: true,
                                                 focusNode: nfocus,
-                                                icon: const Icon(
-                                                  Icons.keyboard_arrow_down,
-                                                  size: 35,
-                                                  color: ColorManager.black,
+                                                iconStyleData:
+                                                    const IconStyleData(
+                                                  icon: Icon(
+                                                    Icons.keyboard_arrow_down,
+                                                    size: 35,
+                                                    color: ColorManager.black,
+                                                  ),
                                                 ),
-                                                hint: provider.regionInfoModel?.result ==
+                                                hint: provider.regionInfoModel
+                                                                ?.result ==
                                                             false ||
                                                         provider.regionInfoModel
                                                                 ?.result ==
@@ -826,17 +844,23 @@ log('states -> ${states.map((e) => e.stateName)}');
                                                       context, regid);
                                                   setState(() {});
                                                 },
-                                                buttonHeight: 50,
-                                                dropdownMaxHeight: h * .6,
-                                                // buttonWidth: 140,
-                                                itemHeight: 40,
-                                                buttonPadding:
-                                                    const EdgeInsets.fromLTRB(
-                                                        12, 0, 8, 0),
-                                                // dropdownWidth: size.width,
-                                                itemPadding:
-                                                    const EdgeInsets.fromLTRB(
-                                                        12, 0, 12, 0),
+                                                buttonStyleData:
+                                                    ButtonStyleData(
+                                                  height: 50,
+                                                  padding:
+                                                      const EdgeInsets.fromLTRB(
+                                                          12, 0, 8, 0),
+                                                ),
+                                                dropdownStyleData:
+                                                    DropdownStyleData(
+                                                  maxHeight: h * .6,
+                                                ),
+                                                menuItemStyleData:
+                                                    const MenuItemStyleData(
+                                                  height: 40,
+                                                  padding: EdgeInsets.fromLTRB(
+                                                      12, 0, 12, 0),
+                                                ),
                                                 // searchController:
                                                 //     AddressEditControllers
                                                 //         .searchController,
@@ -889,7 +913,7 @@ log('states -> ${states.map((e) => e.stateName)}');
                                                             child: Padding(
                                                               padding:
                                                                   const EdgeInsets
-                                                                          .fromLTRB(
+                                                                      .fromLTRB(
                                                                       10,
                                                                       15,
                                                                       10,
@@ -985,10 +1009,13 @@ log('states -> ${states.map((e) => e.stateName)}');
                                                 child: DropdownButton2<States>(
                                                   isExpanded: true,
                                                   // focusNode: nfocus,
-                                                  icon: const Icon(
-                                                    Icons.keyboard_arrow_down,
-                                                    size: 35,
-                                                    color: ColorManager.black,
+                                                  iconStyleData:
+                                                      const IconStyleData(
+                                                    icon: Icon(
+                                                      Icons.keyboard_arrow_down,
+                                                      size: 35,
+                                                      color: ColorManager.black,
+                                                    ),
                                                   ),
                                                   hint: provider.stateinfomodel
                                                                   ?.result ==
@@ -1035,24 +1062,29 @@ log('states -> ${states.map((e) => e.stateName)}');
                                                       stateid =
                                                           value?.id.toString();
                                                     });
-                                                    
+
                                                     EditProfileControllers
                                                         .stateController
                                                         .text = defState ?? '';
                                                     // s(selectedValue);
                                                   },
-                                                  buttonHeight: 50,
-                                                  dropdownMaxHeight:
-                                                      size.height * .6,
-                                                  // buttonWidth: 140,
-                                                  itemHeight: 40,
-                                                  buttonPadding:
-                                                      const EdgeInsets.fromLTRB(
-                                                          12, 0, 8, 0),
-                                                  // dropdownWidth: size.width,
-                                                  itemPadding:
-                                                      const EdgeInsets.fromLTRB(
-                                                          12, 0, 12, 0),
+                                                  buttonStyleData:
+                                                      ButtonStyleData(
+                                                    height: 50,
+                                                    padding: const EdgeInsets
+                                                        .fromLTRB(12, 0, 8, 0),
+                                                  ),
+                                                  dropdownStyleData:
+                                                      DropdownStyleData(
+                                                    maxHeight: size.height * .6,
+                                                  ),
+                                                  menuItemStyleData:
+                                                      const MenuItemStyleData(
+                                                    height: 40,
+                                                    padding:
+                                                        EdgeInsets.fromLTRB(
+                                                            12, 0, 12, 0),
+                                                  ),
                                                   // searchController:
                                                   //     AddressEditControllers
                                                   //         .searchController,
@@ -1107,7 +1139,7 @@ log('states -> ${states.map((e) => e.stateName)}');
                                                             Padding(
                                                               padding:
                                                                   const EdgeInsets
-                                                                          .fromLTRB(
+                                                                      .fromLTRB(
                                                                       10,
                                                                       15,
                                                                       10,
@@ -1300,14 +1332,19 @@ log('states -> ${states.map((e) => e.stateName)}');
       setState(() {
         loading = true;
       });
-      await updateProfile(firstname:  firstname ,lastname:  lastname,dob:  dob, email: email);
+      await updateProfile(
+          firstname: firstname, lastname: lastname, dob: dob, email: email);
       setState(() {
         loading = false;
       });
     }
   }
 
-  updateProfile({required String firstname,required String lastname,required String dob , required String email}) async {
+  updateProfile(
+      {required String firstname,
+      required String lastname,
+      required String dob,
+      required String email}) async {
     log("regid===================${stateid.toString()}");
     final apiToken = Hive.box("token").get('api_token');
     final provider = Provider.of<DataProvider>(context, listen: false);
@@ -1328,7 +1365,7 @@ log('states -> ${states.map((e) => e.stateName)}');
             "device-id": provider.deviceId ?? '',
             "api-token": apiToken
           });
-          log('updateProfile -- > ${response.request}');
+      log('updateProfile -- > ${response.request}');
       if (response.statusCode == 200) {
         var jsonResponse = jsonDecode(response.body);
         print(jsonResponse);
@@ -1407,7 +1444,7 @@ log('states -> ${states.map((e) => e.stateName)}');
         provider.viewProfileModel?.userdetails?.city ?? '';
     EditProfileControllers.stateController.text =
         provider.viewProfileModel?.userdetails?.statename ?? '';
-        
+
     EditProfileControllers.aboutController.text =
         provider.viewProfileModel?.userdetails?.about ?? '';
     EditProfileControllers.emailController.text =

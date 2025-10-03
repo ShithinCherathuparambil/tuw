@@ -42,18 +42,18 @@ import 'package:tuw_services/widgets/top_logo.dart';
 import '../../model/chat_list.dart';
 
 class ServicerPage extends StatefulWidget {
-final  bool isUpdate;
- final int? id;
- final bool? isAdvancedSearchEnabled;
-final  Services? homeservice;
-final  String? defRegion;
-final  String? defstate;
-final  int? countryid;
-final  int? regid;
-final  int? stateid;
-final  String? selectedValue;
-final  String? servicer;
-const  ServicerPage(
+  final bool isUpdate;
+  final int? id;
+  final bool? isAdvancedSearchEnabled;
+  final Services? homeservice;
+  final String? defRegion;
+  final String? defstate;
+  final int? countryid;
+  final int? regid;
+  final int? stateid;
+  final String? selectedValue;
+  final String? servicer;
+  const ServicerPage(
       {super.key,
       this.id,
       this.isAdvancedSearchEnabled = false,
@@ -65,8 +65,7 @@ const  ServicerPage(
       this.countryid,
       this.regid,
       this.stateid,
-      this.servicer
-      });
+      this.servicer});
 
   @override
   State<ServicerPage> createState() => _ServicerPageState();
@@ -503,7 +502,7 @@ class _ServicerPageState extends State<ServicerPage> {
                                                               width: .4,
                                                               height: 48,
                                                               color: const Color
-                                                                      .fromARGB(
+                                                                  .fromARGB(
                                                                   255,
                                                                   206,
                                                                   205,
@@ -513,7 +512,7 @@ class _ServicerPageState extends State<ServicerPage> {
                                                           Padding(
                                                             padding:
                                                                 const EdgeInsets
-                                                                        .fromLTRB(
+                                                                    .fromLTRB(
                                                                     5, 0, 5, 0),
                                                             child: Text(
                                                               textAlign:
@@ -645,7 +644,7 @@ class _ServicerPageState extends State<ServicerPage> {
                                                         child: Padding(
                                                           padding:
                                                               const EdgeInsets
-                                                                      .fromLTRB(
+                                                                  .fromLTRB(
                                                                   0, 10, 0, 10),
                                                           child:
                                                               DropdownButtonHideUnderline(
@@ -654,20 +653,17 @@ class _ServicerPageState extends State<ServicerPage> {
                                                                     isExpanded:
                                                                         true,
                                                                     // focusNode: nfocus,
-                                                                    icon:
-                                                                        const Icon(
-                                                                      Icons
-                                                                          .keyboard_arrow_down,
-                                                                      size: 35,
-                                                                      color: ColorManager
-                                                                          .black,
-                                                                    ),
                                                                     hint: Text(
-                                                                          str
-                                                                              .ae_country_h,
-                                                                          style: getRegularStyle(
-                                                                              color: const Color.fromARGB(255, 173, 173, 173),
-                                                                              fontSize: 15)),
+                                                                        str
+                                                                            .ae_country_h,
+                                                                        style: getRegularStyle(
+                                                                            color: const Color.fromARGB(
+                                                                                255,
+                                                                                173,
+                                                                                173,
+                                                                                173),
+                                                                            fontSize:
+                                                                                15)),
                                                                     items: r3
                                                                         .map((item) =>
                                                                             DropdownMenuItem<
@@ -701,94 +697,111 @@ class _ServicerPageState extends State<ServicerPage> {
                                                                       setState(
                                                                           () {});
                                                                     },
-                                                                    buttonHeight:
-                                                                        40,
-                                                                    dropdownMaxHeight:
-                                                                        size
-                                                                                .height *
-                                                                            .6,
-                                                                    // buttonWidth: 140,
-                                                                    itemHeight:
-                                                                        40,
-                                                                    buttonPadding:
-                                                                        const EdgeInsets.fromLTRB(
-                                                                            12,
-                                                                            0,
-                                                                            8,
-                                                                            0),
-                                                                    // dropdownWidth: size.width,
-                                                                    itemPadding:
-                                                                        const EdgeInsets.fromLTRB(
-                                                                            12,
-                                                                            0,
-                                                                            12,
-                                                                            0),
-                                                                    searchController:
-                                                                        AddressEditControllers
-                                                                            .searchController,
-                                                                    searchInnerWidgetHeight: 50,
-                                                                    searchInnerWidget:
-                                                                        Padding(
-                                                                      padding:
-                                                                          const EdgeInsets
-                                                                              .only(
-                                                                        top: 8,
-                                                                        bottom:
-                                                                            4,
-                                                                        right:
-                                                                            8,
-                                                                        left: 8,
+                                                                    iconStyleData:
+                                                                        const IconStyleData(
+                                                                      icon:
+                                                                          Icon(
+                                                                        Icons
+                                                                            .keyboard_arrow_down,
+                                                                        size:
+                                                                            35,
+                                                                        color: ColorManager
+                                                                            .black,
                                                                       ),
-                                                                      child:
-                                                                          TextFormField(
-                                                                        controller:
-                                                                            AddressEditControllers.searchController,
-                                                                        decoration:
-                                                                            InputDecoration(
-                                                                          isDense:
-                                                                              true,
-                                                                          contentPadding:
-                                                                              const EdgeInsets.symmetric(
-                                                                            horizontal:
-                                                                                10,
-                                                                            vertical:
-                                                                                8,
-                                                                          ),
-                                                                          hintText:
-                                                                              str.s_search_country,
-                                                                          hintStyle:
-                                                                              const TextStyle(fontSize: 12),
-                                                                          border:
-                                                                              OutlineInputBorder(
-                                                                            borderRadius:
-                                                                                BorderRadius.circular(8),
-                                                                          ),
-                                                                          suffixIcon:
-                                                                              InkWell(
-                                                                            onTap:
-                                                                                () {
-                                                                              setState(() {
-                                                                                selectedValue = null;
-                                                                                countryid = null;
-                                                                              });
-                                                                              Navigator.pop(context);
-                                                                            },
-                                                                            child:
-                                                                                const Icon(size: 25, Icons.close),
+                                                                    ),
+                                                                    buttonStyleData:
+                                                                        ButtonStyleData(
+                                                                      height:
+                                                                          40,
+                                                                      padding: const EdgeInsets
+                                                                          .fromLTRB(
+                                                                          12,
+                                                                          0,
+                                                                          8,
+                                                                          0),
+                                                                    ),
+                                                                    dropdownStyleData:
+                                                                        DropdownStyleData(
+                                                                      maxHeight:
+                                                                          size.height *
+                                                                              .6,
+                                                                    ),
+                                                                    menuItemStyleData:
+                                                                        const MenuItemStyleData(
+                                                                      height:
+                                                                          40,
+                                                                      padding: EdgeInsets
+                                                                          .fromLTRB(
+                                                                              12,
+                                                                              0,
+                                                                              12,
+                                                                              0),
+                                                                    ),
+                                                                    dropdownSearchData:
+                                                                        DropdownSearchData(
+                                                                      searchController:
+                                                                          AddressEditControllers
+                                                                              .searchController,
+                                                                      searchInnerWidgetHeight:
+                                                                          50,
+                                                                      searchInnerWidget:
+                                                                          Padding(
+                                                                        padding:
+                                                                            const EdgeInsets.only(
+                                                                          top:
+                                                                              8,
+                                                                          bottom:
+                                                                              4,
+                                                                          right:
+                                                                              8,
+                                                                          left:
+                                                                              8,
+                                                                        ),
+                                                                        child:
+                                                                            TextFormField(
+                                                                          controller:
+                                                                              AddressEditControllers.searchController,
+                                                                          decoration:
+                                                                              InputDecoration(
+                                                                            isDense:
+                                                                                true,
+                                                                            contentPadding:
+                                                                                const EdgeInsets.symmetric(
+                                                                              horizontal: 10,
+                                                                              vertical: 8,
+                                                                            ),
+                                                                            hintText:
+                                                                                str.s_search_country,
+                                                                            hintStyle:
+                                                                                const TextStyle(fontSize: 12),
+                                                                            border:
+                                                                                OutlineInputBorder(
+                                                                              borderRadius: BorderRadius.circular(8),
+                                                                            ),
+                                                                            suffixIcon:
+                                                                                InkWell(
+                                                                              onTap: () {
+                                                                                setState(() {
+                                                                                  selectedValue = null;
+                                                                                  countryid = null;
+                                                                                });
+                                                                                Navigator.pop(context);
+                                                                              },
+                                                                              child: const Icon(size: 25, Icons.close),
+                                                                            ),
                                                                           ),
                                                                         ),
                                                                       ),
+                                                                      searchMatchFn:
+                                                                          (item,
+                                                                              searchValue) {
+                                                                        return (item
+                                                                            .value
+                                                                            .toString()
+                                                                            .toLowerCase()
+                                                                            .contains(searchValue));
+                                                                      },
                                                                     ),
-                                                                    searchMatchFn:
-                                                                        (item,
-                                                                            searchValue) {
-                                                                      return (item
-                                                                          .value
-                                                                          .toString()
-                                                                          .toLowerCase()
-                                                                          .contains(
-                                                                              searchValue));
-                                                                    },
                                                                     //This to clear the search value when you close the menu
                                                                     onMenuStateChange:
                                                                         (isOpen) {
@@ -860,13 +873,7 @@ class _ServicerPageState extends State<ServicerPage> {
                                                             Regions>(
                                                           isExpanded: true,
                                                           // focusNode: nfocus,
-                                                          icon: const Icon(
-                                                            Icons
-                                                                .keyboard_arrow_down,
-                                                            size: 35,
-                                                            color: ColorManager
-                                                                .black,
-                                                          ),
+
                                                           hint: provider.regionInfoModel
                                                                           ?.result ==
                                                                       false ||
@@ -932,21 +939,41 @@ class _ServicerPageState extends State<ServicerPage> {
                                                                 context, regid);
                                                             setState(() {});
                                                           },
-
-                                                          buttonHeight: 50,
-                                                          dropdownMaxHeight:
-                                                              size.height * .6,
-                                                          // buttonWidth: 140,
-                                                          itemHeight: 40,
-                                                          buttonPadding:
-                                                              const EdgeInsets
-                                                                      .fromLTRB(
-                                                                  12, 0, 8, 0),
-                                                          // dropdownWidth: size.width,
-                                                          itemPadding:
-                                                              const EdgeInsets
-                                                                      .fromLTRB(
-                                                                  12, 0, 12, 0),
+                                                          iconStyleData:
+                                                              const IconStyleData(
+                                                            icon: Icon(
+                                                              Icons
+                                                                  .keyboard_arrow_down,
+                                                              size: 35,
+                                                              color:
+                                                                  ColorManager
+                                                                      .black,
+                                                            ),
+                                                          ),
+                                                          buttonStyleData:
+                                                              ButtonStyleData(
+                                                            height: 50,
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .fromLTRB(
+                                                                    12,
+                                                                    0,
+                                                                    8,
+                                                                    0),
+                                                          ),
+                                                          dropdownStyleData:
+                                                              DropdownStyleData(
+                                                            maxHeight:
+                                                                size.height *
+                                                                    .6,
+                                                          ),
+                                                          menuItemStyleData:
+                                                              const MenuItemStyleData(
+                                                            height: 40,
+                                                            padding: EdgeInsets
+                                                                .fromLTRB(12, 0,
+                                                                    12, 0),
+                                                          ),
                                                           // searchController:
                                                           //     AddressEditControllers
                                                           //         .searchController,
@@ -970,7 +997,7 @@ class _ServicerPageState extends State<ServicerPage> {
                                                           //         horizontal: 10,
                                                           //         vertical: 8,
                                                           //       ),
-                                                           //       hintText:
+                                                          //       hintText:
                                                           //           str.s_search_country,
                                                           //       hintStyle:
                                                           //           const TextStyle(
@@ -1068,9 +1095,11 @@ class _ServicerPageState extends State<ServicerPage> {
                                                             InputDecoration(
                                                                 suffixIcon:
                                                                     Padding(
-                                                                  padding: const EdgeInsets
+                                                                  padding:
+                                                                      const EdgeInsets
                                                                           .only(
-                                                                      right: 5),
+                                                                          right:
+                                                                              5),
                                                                   child:
                                                                       SizedBox(
                                                                     width:
@@ -1130,7 +1159,7 @@ class _ServicerPageState extends State<ServicerPage> {
                                                                 hintText: 'Map',
                                                                 hintStyle: getRegularStyle(
                                                                     color: const Color
-                                                                            .fromARGB(
+                                                                        .fromARGB(
                                                                         255,
                                                                         173,
                                                                         173,
@@ -1150,14 +1179,14 @@ class _ServicerPageState extends State<ServicerPage> {
                                                   children: [
                                                     Padding(
                                                       padding: const EdgeInsets
-                                                              .fromLTRB(
+                                                          .fromLTRB(
                                                           0, 10, 0, 0),
                                                       child: TitleWidget(
                                                           name: str.s_state),
                                                     ),
                                                     Padding(
                                                       padding: const EdgeInsets
-                                                              .fromLTRB(
+                                                          .fromLTRB(
                                                           0, 10, 0, 0),
                                                       child: Container(
                                                         width: size.width * .44,
@@ -1207,14 +1236,7 @@ class _ServicerPageState extends State<ServicerPage> {
                                                                   States>(
                                                             isExpanded: true,
                                                             // focusNode: nfocus,
-                                                            icon: const Icon(
-                                                              Icons
-                                                                  .keyboard_arrow_down,
-                                                              size: 35,
-                                                              color:
-                                                                  ColorManager
-                                                                      .black,
-                                                            ),
+
                                                             hint: provider.stateinfomodel?.result == false ||
                                                                     provider.stateinfomodel?.result ==
                                                                         null
@@ -1270,27 +1292,45 @@ class _ServicerPageState extends State<ServicerPage> {
                                                                       '';
                                                               // s(selectedValue);
                                                             },
-                                                            buttonHeight: 50,
-                                                            dropdownMaxHeight:
-                                                                size.height *
-                                                                    .6,
-                                                            // buttonWidth: 140,
-                                                            itemHeight: 40,
-                                                            buttonPadding:
-                                                                const EdgeInsets
-                                                                        .fromLTRB(
-                                                                    12,
-                                                                    0,
-                                                                    8,
-                                                                    0),
-                                                            // dropdownWidth: size.width,
-                                                            itemPadding:
-                                                                const EdgeInsets
-                                                                        .fromLTRB(
-                                                                    12,
-                                                                    0,
-                                                                    12,
-                                                                    0),
+                                                            iconStyleData:
+                                                                const IconStyleData(
+                                                              icon: Icon(
+                                                                Icons
+                                                                    .keyboard_arrow_down,
+                                                                size: 35,
+                                                                color:
+                                                                    ColorManager
+                                                                        .black,
+                                                              ),
+                                                            ),
+                                                            buttonStyleData:
+                                                                ButtonStyleData(
+                                                              height: 50,
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .fromLTRB(
+                                                                      12,
+                                                                      0,
+                                                                      8,
+                                                                      0),
+                                                            ),
+                                                            dropdownStyleData:
+                                                                DropdownStyleData(
+                                                              maxHeight:
+                                                                  size.height *
+                                                                      .6,
+                                                            ),
+                                                            menuItemStyleData:
+                                                                const MenuItemStyleData(
+                                                              height: 40,
+                                                              padding:
+                                                                  EdgeInsets
+                                                                      .fromLTRB(
+                                                                          12,
+                                                                          0,
+                                                                          12,
+                                                                          0),
+                                                            ),
                                                             // searchController:
                                                             //     AddressEditControllers
                                                             //         .searchController,
@@ -1314,7 +1354,7 @@ class _ServicerPageState extends State<ServicerPage> {
                                                             //         horizontal: 10,
                                                             //         vertical: 8,
                                                             //       ),
-                                                             //       hintText:
+                                                            //       hintText:
                                                             //           str.s_search_country,
                                                             //       hintStyle:
                                                             //           const TextStyle(
@@ -1370,9 +1410,7 @@ class _ServicerPageState extends State<ServicerPage> {
                                                   ])
                                             ],
                                           ),
-                                          const SizedBox(
-                                            height: 5
-                                          ),
+                                          const SizedBox(height: 5),
                                           SizedBox(
                                             width: size.width,
                                             child: ElevatedButton(
@@ -1511,7 +1549,8 @@ class _ServicerPageState extends State<ServicerPage> {
                                             );
                                           },
                                           child: ServicerListTile(
-                                              serviceman: serviceman??Serviceman(),
+                                              serviceman:
+                                                  serviceman ?? Serviceman(),
                                               index: index),
                                         ),
                                       );

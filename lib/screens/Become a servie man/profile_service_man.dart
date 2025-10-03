@@ -114,14 +114,13 @@ class _ProfileServicePageState extends State<ProfileServicePage> {
       print("city=============================${fieldData?.state}");
       print(
           "state=============================${provider.viewProfileModel?.userdetails?.statename}");
- 
 
       // countryid = 165;
-     String? stateID = fieldData?.state;
-     String? regionID = fieldData?.region;
-  
- log('provider.viewProfileModel?.userdetails?.stateId --> ${provider.viewProfileModel?.userdetails?.stateId}');
- log('provider.viewProfileModel?.userdetails?.regionId --> ${provider.viewProfileModel?.userdetails?.regionId}');
+      String? stateID = fieldData?.state;
+      String? regionID = fieldData?.region;
+
+      log('provider.viewProfileModel?.userdetails?.stateId --> ${provider.viewProfileModel?.userdetails?.stateId}');
+      log('provider.viewProfileModel?.userdetails?.regionId --> ${provider.viewProfileModel?.userdetails?.regionId}');
       // int? n = provider.countriesModel?.countries?.length;
       // int i = 0;
 
@@ -133,18 +132,18 @@ class _ProfileServicePageState extends State<ProfileServicePage> {
 
       provider.clearRegions();
       provider.clearStates();
- log('provider.viewProfileModel?.userdetails?.stateId 2--> ${provider.viewProfileModel?.userdetails?.stateId}');
- log('provider.viewProfileModel?.userdetails?.regionId 2--> ${provider.viewProfileModel?.userdetails?.regionId}');
+      log('provider.viewProfileModel?.userdetails?.stateId 2--> ${provider.viewProfileModel?.userdetails?.stateId}');
+      log('provider.viewProfileModel?.userdetails?.regionId 2--> ${provider.viewProfileModel?.userdetails?.regionId}');
       await getRegionData(
           context, provider.viewProfileModel?.userdetails?.countryId);
       await getStateData(
           context, provider.viewProfileModel?.userdetails?.region);
- log('provider.viewProfileModel?.userdetails?.stateId 3--> ${provider.viewProfileModel?.userdetails?.stateId}');
- log('provider.viewProfileModel?.userdetails?.regionId 3--> ${provider.viewProfileModel?.userdetails?.regionId}');
+      log('provider.viewProfileModel?.userdetails?.stateId 3--> ${provider.viewProfileModel?.userdetails?.stateId}');
+      log('provider.viewProfileModel?.userdetails?.regionId 3--> ${provider.viewProfileModel?.userdetails?.regionId}');
       setState(() {});
 
       getCustomerParent(context);
-          if (stateID != null) {
+      if (stateID != null) {
         provider.viewProfileModel?.userdetails?.stateId =
             int.parse(fieldData?.state ?? '0');
       }
@@ -153,8 +152,8 @@ class _ProfileServicePageState extends State<ProfileServicePage> {
             int.parse(fieldData?.region ?? '0');
       }
 
- log('provider.viewProfileModel?.userdetails?.stateId 4--> ${provider.viewProfileModel?.userdetails?.stateId}');
- log('provider.viewProfileModel?.userdetails?.regionId 4--> ${provider.viewProfileModel?.userdetails?.regionId}');
+      log('provider.viewProfileModel?.userdetails?.stateId 4--> ${provider.viewProfileModel?.userdetails?.stateId}');
+      log('provider.viewProfileModel?.userdetails?.regionId 4--> ${provider.viewProfileModel?.userdetails?.regionId}');
     });
   }
 
@@ -448,14 +447,15 @@ class _ProfileServicePageState extends State<ProfileServicePage> {
                                                           ),
                                                         ),
                                                         hintText: str.p_dob_h,
-                                                        hintStyle: getRegularStyle(
-                                                            color: const Color
+                                                        hintStyle:
+                                                            getRegularStyle(
+                                                                color: const Color
                                                                     .fromARGB(
-                                                                255,
-                                                                173,
-                                                                173,
-                                                                173),
-                                                            fontSize: 14)),
+                                                                    255,
+                                                                    173,
+                                                                    173,
+                                                                    173),
+                                                                fontSize: 14)),
                                                   ),
                                                 ),
                                               ),
@@ -569,21 +569,84 @@ class _ProfileServicePageState extends State<ProfileServicePage> {
                                                   DropdownButtonHideUnderline(
                                                 child: DropdownButton2<
                                                         Countries>(
-                                                    searchInnerWidgetHeight: 1,
+                                                    dropdownSearchData:
+                                                        DropdownSearchData(
+                                                      searchController:
+                                                          AddressEditControllers
+                                                              .searchController,
+                                                      searchInnerWidgetHeight:
+                                                          1,
+                                                      searchInnerWidget:
+                                                          Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .only(
+                                                          top: 8,
+                                                          bottom: 4,
+                                                          right: 8,
+                                                          left: 8,
+                                                        ),
+                                                        child: TextFormField(
+                                                          controller:
+                                                              AddressEditControllers
+                                                                  .searchController,
+                                                          decoration:
+                                                              InputDecoration(
+                                                            isDense: true,
+                                                            contentPadding:
+                                                                const EdgeInsets
+                                                                    .symmetric(
+                                                              horizontal: 10,
+                                                              vertical: 8,
+                                                            ),
+                                                            hintText: str
+                                                                .s_search_country,
+                                                            hintStyle:
+                                                                getRegularStyle(
+                                                                    color: const Color
+                                                                        .fromARGB(
+                                                                        255,
+                                                                        173,
+                                                                        173,
+                                                                        173),
+                                                                    fontSize:
+                                                                        15),
+                                                            border:
+                                                                OutlineInputBorder(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          8),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      searchMatchFn:
+                                                          (item, searchValue) {
+                                                        return (item
+                                                            .value!.countryName
+                                                            .toString()
+                                                            .toLowerCase()
+                                                            .contains(
+                                                                searchValue));
+                                                      },
+                                                    ),
                                                     isExpanded: true,
-                                                    icon: const Icon(
-                                                      Icons.keyboard_arrow_down,
-                                                      size: 35,
-                                                      color: ColorManager.black,
+                                                    iconStyleData:
+                                                        const IconStyleData(
+                                                      icon: Icon(
+                                                        Icons
+                                                            .keyboard_arrow_down,
+                                                        size: 35,
+                                                        color:
+                                                            ColorManager.black,
+                                                      ),
                                                     ),
                                                     hint: Text(str.ae_country_h,
                                                         style: getRegularStyle(
-                                                            color:
-                                                                const Color.fromARGB(
-                                                                    255,
-                                                                    173,
-                                                                    173,
-                                                                    173),
+                                                            color: const Color
+                                                                .fromARGB(255,
+                                                                173, 173, 173),
                                                             fontSize: 15)),
                                                     items: countries
                                                         .map(
@@ -662,55 +725,23 @@ class _ProfileServicePageState extends State<ProfileServicePage> {
                                                       // provider.selectedAddressCountry =
                                                       //     value as Countries;
                                                     },
-                                                    buttonHeight: 40,
-                                                    dropdownMaxHeight: h * .6,
-                                                    // buttonWidth: 140,
-                                                    itemHeight: 40,
-                                                    buttonPadding:
-                                                        const EdgeInsets.fromLTRB(
-                                                            12, 0, 8, 0),
-                                                    // dropdownWidth: size.width,
-                                                    itemPadding:
-                                                        const EdgeInsets.fromLTRB(
-                                                            12, 0, 12, 0),
-                                                    searchController:
-                                                        AddressEditControllers
-                                                            .searchController,
-                                                    searchInnerWidget: Padding(
+                                                    buttonStyleData:
+                                                        ButtonStyleData(
+                                                      height: 40,
+                                                      padding: const EdgeInsets
+                                                          .fromLTRB(
+                                                          12, 0, 8, 0),
+                                                    ),
+                                                    dropdownStyleData:
+                                                        DropdownStyleData(
+                                                      maxHeight: h * .6,
+                                                    ),
+                                                    menuItemStyleData:
+                                                        const MenuItemStyleData(
+                                                      height: 40,
                                                       padding:
-                                                          const EdgeInsets.only(
-                                                        top: 8,
-                                                        bottom: 4,
-                                                        right: 8,
-                                                        left: 8,
-                                                      ),
-                                                      child: TextFormField(
-                                                        controller:
-                                                            AddressEditControllers
-                                                                .searchController,
-                                                        decoration:
-                                                            InputDecoration(
-                                                          isDense: true,
-                                                          contentPadding:
-                                                              const EdgeInsets
-                                                                  .symmetric(
-                                                            horizontal: 10,
-                                                            vertical: 8,
-                                                          ),
-                                                          hintText: str
-                                                              .s_search_country,
-                                                          hintStyle:
-                                                              const TextStyle(
-                                                                  fontSize: 12),
-                                                          border:
-                                                              OutlineInputBorder(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        8),
-                                                          ),
-                                                        ),
-                                                      ),
+                                                          EdgeInsets.fromLTRB(
+                                                              12, 0, 12, 0),
                                                     ),
                                                     customButton:
                                                         selectedValue == null
@@ -720,12 +751,12 @@ class _ProfileServicePageState extends State<ProfileServicePage> {
                                                                   Center(
                                                                     child:
                                                                         Padding(
-                                                                      padding:
-                                                                          const EdgeInsets.fromLTRB(
-                                                                              10,
-                                                                              0,
-                                                                              10,
-                                                                              0),
+                                                                      padding: const EdgeInsets
+                                                                          .fromLTRB(
+                                                                          10,
+                                                                          0,
+                                                                          10,
+                                                                          0),
                                                                       child: Text(
                                                                           selectedValue ??
                                                                               ''),
@@ -733,17 +764,10 @@ class _ProfileServicePageState extends State<ProfileServicePage> {
                                                                   ),
                                                                 ],
                                                               ),
-                                                    searchMatchFn:
-                                                        (item, searchValue) {
-                                                      return (item
-                                                          .value!.countryName
-                                                          .toString()
-                                                          .toLowerCase()
-                                                          .contains(
-                                                              searchValue));
-                                                    },
+
                                                     //This to clear the search value when you close the menu
-                                                    onMenuStateChange: (isOpen) {
+                                                    onMenuStateChange:
+                                                        (isOpen) {
                                                       if (!isOpen) {
                                                         AddressEditControllers
                                                             .searchController
@@ -797,12 +821,15 @@ class _ProfileServicePageState extends State<ProfileServicePage> {
                                                         Regions>(
                                                       isExpanded: true,
                                                       focusNode: nfocus,
-                                                      icon: const Icon(
-                                                        Icons
-                                                            .keyboard_arrow_down,
-                                                        size: 35,
-                                                        color:
-                                                            ColorManager.black,
+                                                      iconStyleData:
+                                                          const IconStyleData(
+                                                        icon: Icon(
+                                                          Icons
+                                                              .keyboard_arrow_down,
+                                                          size: 35,
+                                                          color: ColorManager
+                                                              .black,
+                                                        ),
                                                       ),
                                                       hint: provider.regionInfoModel
                                                                       ?.result ==
@@ -823,7 +850,10 @@ class _ProfileServicePageState extends State<ProfileServicePage> {
                                                               style: getRegularStyle(
                                                                   color: const Color.fromARGB(255, 173, 173, 173),
                                                                   fontSize: 15)),
-                                                      itemHeight: 60,
+                                                      menuItemStyleData:
+                                                          const MenuItemStyleData(
+                                                        height: 60,
+                                                      ),
                                                       items: provider
                                                           .regionInfoModel
                                                           ?.regions!
@@ -881,10 +911,13 @@ class _ProfileServicePageState extends State<ProfileServicePage> {
                                                             context, regid);
                                                         setState(() {});
                                                       },
-                                                      buttonPadding:
-                                                          const EdgeInsets
-                                                                  .fromLTRB(
-                                                              8, 0, 8, 0),
+                                                      buttonStyleData:
+                                                          ButtonStyleData(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .fromLTRB(
+                                                                8, 0, 8, 0),
+                                                      ),
                                                       // buttonHeight: 50 * h,
                                                       // dropdownMaxHeight: h * .6,
                                                       // buttonWidth: 140,
@@ -903,7 +936,8 @@ class _ProfileServicePageState extends State<ProfileServicePage> {
                                                                     Center(
                                                                       child:
                                                                           Padding(
-                                                                        padding: const EdgeInsets.fromLTRB(
+                                                                        padding: const EdgeInsets
+                                                                            .fromLTRB(
                                                                             10,
                                                                             15,
                                                                             10,
@@ -977,12 +1011,15 @@ class _ProfileServicePageState extends State<ProfileServicePage> {
                                                           States>(
                                                         isExpanded: true,
                                                         focusNode: nfocus,
-                                                        icon: const Icon(
-                                                          Icons
-                                                              .keyboard_arrow_down,
-                                                          size: 35,
-                                                          color: ColorManager
-                                                              .black,
+                                                        iconStyleData:
+                                                            const IconStyleData(
+                                                          icon: Icon(
+                                                            Icons
+                                                                .keyboard_arrow_down,
+                                                            size: 35,
+                                                            color: ColorManager
+                                                                .black,
+                                                          ),
                                                         ),
                                                         hint: provider.stateinfomodel
                                                                         ?.result ==
@@ -1057,20 +1094,21 @@ class _ProfileServicePageState extends State<ProfileServicePage> {
                                                               value?.id;
                                                           // s(selectedValue);
                                                         },
-                                                        buttonHeight: 50,
-                                                        // dropdownMaxHeight:
-                                                        //     h * .6,
-                                                        // buttonWidth: 140,
-                                                        itemHeight: 70,
-                                                        buttonPadding:
-                                                            const EdgeInsets
-                                                                    .fromLTRB(
-                                                                12, 0, 8, 0),
-                                                        // dropdownWidth: size.width,
-                                                        itemPadding:
-                                                            const EdgeInsets
-                                                                    .fromLTRB(
-                                                                12, 0, 12, 0),
+                                                        buttonStyleData:
+                                                            ButtonStyleData(
+                                                          height: 50,
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .fromLTRB(
+                                                                  12, 0, 8, 0),
+                                                        ),
+                                                        menuItemStyleData:
+                                                            const MenuItemStyleData(
+                                                          height: 70,
+                                                          padding: EdgeInsets
+                                                              .fromLTRB(
+                                                                  12, 0, 12, 0),
+                                                        ),
 
                                                         customButton:
                                                             defRegion == null
@@ -1081,7 +1119,8 @@ class _ProfileServicePageState extends State<ProfileServicePage> {
                                                                             .start,
                                                                     children: [
                                                                       Padding(
-                                                                        padding: const EdgeInsets.fromLTRB(
+                                                                        padding: const EdgeInsets
+                                                                            .fromLTRB(
                                                                             10,
                                                                             15,
                                                                             10,

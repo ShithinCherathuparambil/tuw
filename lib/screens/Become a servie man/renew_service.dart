@@ -74,16 +74,14 @@ class _RenewServicePageState extends State<RenewServicePage> {
       setState(() {
         isChild = provider.customerChildSer!.childservices!.isNotEmpty;
       });
-       ChildServiceModel? itemModel = provider.customerChildSer;
-    List<Document> documents = itemModel?.documents ?? [];
-    for(var item in documents){
-      item.file = null;
-      item.fileName = null;
-    }
+      ChildServiceModel? itemModel = provider.customerChildSer;
+      List<Document> documents = itemModel?.documents ?? [];
+      for (var item in documents) {
+        item.file = null;
+        item.fileName = null;
+      }
       // getCustomerChild(context);
     });
-  
-  
   }
 
   @override
@@ -346,15 +344,18 @@ class _RenewServicePageState extends State<RenewServicePage> {
                                                 0, 10, 0, 10),
                                             child: DropdownButtonHideUnderline(
                                               child: DropdownButton2(
-                                                icon: const Icon(
-                                                  Icons.keyboard_arrow_down,
-                                                  size: 35,
-                                                  color: ColorManager.black,
+                                                iconStyleData:
+                                                    const IconStyleData(
+                                                  icon: Icon(
+                                                    Icons.keyboard_arrow_down,
+                                                    size: 35,
+                                                    color: ColorManager.black,
+                                                  ),
                                                 ),
                                                 hint: Text('Enter List',
                                                     style: getRegularStyle(
                                                         color: const Color
-                                                                .fromARGB(
+                                                            .fromARGB(
                                                             255, 173, 173, 173),
                                                         fontSize: 15)),
                                                 items: childGroup
@@ -390,7 +391,7 @@ class _RenewServicePageState extends State<RenewServicePage> {
                                                         : Padding(
                                                             padding:
                                                                 const EdgeInsets
-                                                                        .fromLTRB(
+                                                                    .fromLTRB(
                                                                     10,
                                                                     5,
                                                                     10,
@@ -400,16 +401,19 @@ class _RenewServicePageState extends State<RenewServicePage> {
                                                                         ?.serviceName ??
                                                                     ''),
                                                           ),
-                                                buttonHeight: 40,
-                                                // buttonWidth: 140,
-                                                itemHeight: 40,
-                                                buttonPadding:
-                                                    const EdgeInsets.fromLTRB(
-                                                        12, 0, 8, 0),
-                                                // dropdownWidth: size.width,
-                                                itemPadding:
-                                                    const EdgeInsets.fromLTRB(
-                                                        12, 0, 12, 0),
+                                                buttonStyleData:
+                                                    ButtonStyleData(
+                                                  height: 40,
+                                                  padding:
+                                                      const EdgeInsets.fromLTRB(
+                                                          12, 0, 8, 0),
+                                                ),
+                                                menuItemStyleData:
+                                                    const MenuItemStyleData(
+                                                  height: 40,
+                                                  padding: EdgeInsets.fromLTRB(
+                                                      12, 0, 12, 0),
+                                                ),
                                               ),
                                             ),
                                           ),
@@ -588,7 +592,8 @@ class _RenewServicePageState extends State<RenewServicePage> {
     ChildServiceModel? item = provider.customerChildSer;
     List<Document> documents = item?.documents ?? [];
     log('${documents.map((e) => e.file)}');
-    bool isAnyFileNeedToSelect = documents.any((element) => element.file ==null);
+    bool isAnyFileNeedToSelect =
+        documents.any((element) => element.file == null);
     final str = AppLocalizations.of(context)!;
     if (!isTickSelected) {
       AnimatedSnackBar.material(str.c_snack,
@@ -602,11 +607,11 @@ class _RenewServicePageState extends State<RenewServicePage> {
     //  else if (selectedValue == null) {
     //   showAnimatedSnackBar(context, str.snack_choose_group);
     // }
-    else if (isAnyFileNeedToSelect ) {
+    else if (isAnyFileNeedToSelect) {
       showAnimatedSnackBar(context, str.snack_upload);
     } else {
       Navigator.push(context, MaterialPageRoute(builder: (ctx) {
-        return   PaymentServicePage(orderType: PlaceOrderType.renew);
+        return PaymentServicePage(orderType: PlaceOrderType.renew);
       }));
     }
   }
