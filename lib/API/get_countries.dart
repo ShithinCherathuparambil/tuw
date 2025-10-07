@@ -12,9 +12,10 @@ import 'package:http/http.dart' as http;
 getCountriesData(BuildContext context) async {
   try {
     final provider = Provider.of<DataProvider>(context, listen: false);
+    log("getCountriesData - $countriesApi");
     var response = await http.get(Uri.parse("$countriesApi"),
         headers: {"device-id": provider.deviceId ?? ''});
-  log ('getCountriesData - ${response.body}');  
+    log('getCountriesData - ${response.body}');
     if (response.statusCode != 200) {
       return;
     }
