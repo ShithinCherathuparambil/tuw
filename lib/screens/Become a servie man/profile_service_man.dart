@@ -400,66 +400,72 @@ class _ProfileServicePageState extends State<ProfileServicePage> {
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
-                                          Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Padding(
-                                                padding:
-                                                    const EdgeInsets.fromLTRB(
-                                                        0, 10, 0, 0),
-                                                child: TitleWidget(
-                                                    name: str.p_dob),
-                                              ),
-                                              Padding(
-                                                padding:
-                                                    const EdgeInsets.fromLTRB(
-                                                        0, 10, 0, 0),
-                                                child: Container(
-                                                  width:
-                                                      mob ? w * 0.5 : w * .45,
-                                                  decoration: BoxDecoration(
-                                                    boxShadow: [
-                                                      BoxShadow(
-                                                        blurRadius: 10.0,
-                                                        color: Colors
-                                                            .grey.shade300,
-                                                        // offset: const Offset(5, 8.5),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  child: TextField(
-                                                    style: const TextStyle(),
-                                                    readOnly: true,
-                                                    controller:
-                                                        ProfileServiceControllers
-                                                            .dateController,
-                                                    decoration: InputDecoration(
-                                                        suffixIcon: InkWell(
-                                                          onTap: () =>
-                                                              _selectDate(
-                                                                  context),
-                                                          child: const Icon(
-                                                            Icons
-                                                                .calendar_month,
-                                                            color: ColorManager
-                                                                .primary,
-                                                          ),
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.fromLTRB(
+                                                          0, 10, 0, 0),
+                                                  child: TitleWidget(
+                                                      name: str.p_dob),
+                                                ),
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.fromLTRB(
+                                                          0, 10, 0, 0),
+                                                  child: Container(
+                                                    width:
+                                                        mob ? w * 0.5 : w * .45,
+                                                    decoration: BoxDecoration(
+                                                      boxShadow: [
+                                                        BoxShadow(
+                                                          blurRadius: 10.0,
+                                                          color: Colors
+                                                              .grey.shade300,
+                                                          // offset: const Offset(5, 8.5),
                                                         ),
-                                                        hintText: str.p_dob_h,
-                                                        hintStyle:
-                                                            getRegularStyle(
-                                                                color: const Color
-                                                                    .fromARGB(
-                                                                    255,
-                                                                    173,
-                                                                    173,
-                                                                    173),
-                                                                fontSize: 14)),
+                                                      ],
+                                                    ),
+                                                    child: TextField(
+                                                      style: const TextStyle(),
+                                                      readOnly: true,
+                                                      controller:
+                                                          ProfileServiceControllers
+                                                              .dateController,
+                                                      decoration:
+                                                          InputDecoration(
+                                                              suffixIcon:
+                                                                  InkWell(
+                                                                onTap: () =>
+                                                                    _selectDate(
+                                                                        context),
+                                                                child:
+                                                                    const Icon(
+                                                                  Icons
+                                                                      .calendar_month,
+                                                                  color: ColorManager
+                                                                      .primary,
+                                                                ),
+                                                              ),
+                                                              hintText:
+                                                                  str.p_dob_h,
+                                                              hintStyle: getRegularStyle(
+                                                                  color: const Color
+                                                                      .fromARGB(
+                                                                      255,
+                                                                      173,
+                                                                      173,
+                                                                      173),
+                                                                  fontSize:
+                                                                      14)),
+                                                    ),
                                                   ),
                                                 ),
-                                              ),
-                                            ],
+                                              ],
+                                            ),
                                           ),
                                           Column(
                                             crossAxisAlignment:

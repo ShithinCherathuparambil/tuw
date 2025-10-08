@@ -460,63 +460,63 @@ class _ProfileDetailsPageState extends State<EditProfileScreen> {
 
                                 Row(
                                   children: [
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Padding(
-                                          padding: const EdgeInsets.fromLTRB(
-                                              0, 15, 0, 0),
-                                          child: TitleWidget(name: str.e_dob),
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.fromLTRB(
-                                              0, 10, 0, 0),
-                                          child: Container(
-                                            width: mob
-                                                ? size.width * 0.5
-                                                : size.width * .45,
-                                            decoration: BoxDecoration(
-                                              boxShadow: [
-                                                BoxShadow(
-                                                  blurRadius: 10.0,
-                                                  color: Colors.grey.shade300,
-                                                  // offset: const Offset(5, 8.5),
-                                                ),
-                                              ],
-                                            ),
-                                            child: TextField(
-                                              style: const TextStyle(),
-                                              readOnly: true,
-                                              controller: EditProfileControllers
-                                                  .dateController,
-                                              decoration: InputDecoration(
-                                                  suffixIcon: InkWell(
-                                                    onTap: () =>
-                                                        _selectDate(context),
-                                                    child: const Icon(
-                                                      Icons.calendar_month,
-                                                      color:
-                                                          ColorManager.primary,
-                                                    ),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.fromLTRB(
+                                                0, 15, 0, 0),
+                                            child: TitleWidget(name: str.e_dob),
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.fromLTRB(
+                                                0, 10, 0, 0),
+                                            child: Container(
+                                              width: mob
+                                                  ? size.width * 0.5
+                                                  : size.width * .45,
+                                              decoration: BoxDecoration(
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    blurRadius: 10.0,
+                                                    color: Colors.grey.shade300,
+                                                    // offset: const Offset(5, 8.5),
                                                   ),
-                                                  hintText: str.e_dob_h,
-                                                  hintStyle: getRegularStyle(
-                                                      color:
-                                                          const Color.fromARGB(
-                                                              255,
-                                                              173,
-                                                              173,
-                                                              173),
-                                                      fontSize:
-                                                          Responsive.isMobile(
-                                                                  context)
-                                                              ? 14
-                                                              : 10)),
+                                                ],
+                                              ),
+                                              child: TextField(
+                                                style: const TextStyle(),
+                                                readOnly: true,
+                                                controller:
+                                                    EditProfileControllers
+                                                        .dateController,
+                                                decoration: InputDecoration(
+                                                    suffixIcon: InkWell(
+                                                      onTap: () =>
+                                                          _selectDate(context),
+                                                      child: const Icon(
+                                                        Icons.calendar_month,
+                                                        color: ColorManager
+                                                            .primary,
+                                                      ),
+                                                    ),
+                                                    hintText: str.e_dob_h,
+                                                    hintStyle: getRegularStyle(
+                                                        color: const Color
+                                                            .fromARGB(
+                                                            255, 173, 173, 173),
+                                                        fontSize:
+                                                            Responsive.isMobile(
+                                                                    context)
+                                                                ? 14
+                                                                : 10)),
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                      ],
+                                        ],
+                                      ),
                                     ),
                                     Column(
                                       crossAxisAlignment:
@@ -677,6 +677,7 @@ class _ProfileDetailsPageState extends State<EditProfileScreen> {
                                                 searchController:
                                                     AddressEditControllers
                                                         .searchController,
+                                                searchInnerWidgetHeight: 50,
                                                 searchInnerWidget: Padding(
                                                   padding:
                                                       const EdgeInsets.only(

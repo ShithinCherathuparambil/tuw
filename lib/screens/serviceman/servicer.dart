@@ -446,116 +446,127 @@ class _ServicerPageState extends State<ServicerPage> {
                               Row(
                                 crossAxisAlignment: CrossAxisAlignment.end,
                                 children: [
-                                  SizedBox(
-                                      height: 48,
-                                      width: size.width * .8,
-                                      child: Padding(
-                                        padding: const EdgeInsets.fromLTRB(
-                                            0, 10, 0, 0),
-                                        child: Container(
-                                          decoration: BoxDecoration(
-                                            boxShadow: [
-                                              BoxShadow(
-                                                blurRadius: 10.0,
-                                                color: Colors.grey.shade300,
-                                                // offset: const Offset(5, 8.5),
-                                              ),
-                                            ],
-                                          ),
-                                          child: TextField(
-                                            // focusNode: nfocus,
-                                            style: const TextStyle(),
-                                            controller: ServiceControllers
-                                                .servicerController,
-                                            onChanged: (value) async {
-                                              print(ServiceControllers
-                                                  .servicerController.text);
-                                              value.isEmpty
-                                                  ? await searchServicer()
-                                                  : null;
-                                              await Future.delayed(
-                                                  const Duration(seconds: 2));
-                                              setState(() {});
-                                            },
-                                            decoration: InputDecoration(
-                                                suffixIcon: Material(
-                                                  // color: Colors.transparent,
-                                                  child: InkWell(
-                                                    // splashColor:
-                                                    //     ColorManager.tertiary,
-                                                    onTap: () async {
-                                                      await searchServicer();
-                                                      await Future.delayed(
-                                                          const Duration(
-                                                              seconds: 1));
-                                                      setState(() {});
-                                                    },
-                                                    child: SizedBox(
-                                                      width: 50,
-                                                      child: Row(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .end,
-                                                        children: [
-                                                          Center(
-                                                            child: Container(
-                                                              width: .4,
-                                                              height: 48,
-                                                              color: const Color
-                                                                  .fromARGB(
-                                                                  255,
-                                                                  206,
-                                                                  205,
-                                                                  205),
-                                                            ),
-                                                          ),
-                                                          Padding(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                    .fromLTRB(
-                                                                    5, 0, 5, 0),
-                                                            child: Text(
-                                                              textAlign:
-                                                                  TextAlign
-                                                                      .center,
-                                                              String.fromCharCode(
-                                                                  Icons.search
-                                                                      .codePoint),
-                                                              style: TextStyle(
-                                                                inherit: false,
-                                                                color:
-                                                                    ColorManager
-                                                                        .primary,
-                                                                fontSize: 20.0,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w700,
-                                                                fontFamily: Icons
-                                                                    .search
-                                                                    .fontFamily,
-                                                                package: Icons
-                                                                    .search
-                                                                    .fontPackage,
+                                  Expanded(
+                                    child: SizedBox(
+                                        height: 48,
+                                        width: size.width * .8,
+                                        child: Padding(
+                                          padding: const EdgeInsets.fromLTRB(
+                                              0, 10, 0, 0),
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  blurRadius: 10.0,
+                                                  color: Colors.grey.shade300,
+                                                  // offset: const Offset(5, 8.5),
+                                                ),
+                                              ],
+                                            ),
+                                            child: TextField(
+                                              // focusNode: nfocus,
+                                              style: const TextStyle(),
+                                              controller: ServiceControllers
+                                                  .servicerController,
+                                              onChanged: (value) async {
+                                                print(ServiceControllers
+                                                    .servicerController.text);
+                                                value.isEmpty
+                                                    ? await searchServicer()
+                                                    : null;
+                                                await Future.delayed(
+                                                    const Duration(seconds: 2));
+                                                setState(() {});
+                                              },
+                                              decoration: InputDecoration(
+                                                  suffixIcon: Material(
+                                                    // color: Colors.transparent,
+                                                    child: InkWell(
+                                                      // splashColor:
+                                                      //     ColorManager.tertiary,
+                                                      onTap: () async {
+                                                        await searchServicer();
+                                                        await Future.delayed(
+                                                            const Duration(
+                                                                seconds: 1));
+                                                        setState(() {});
+                                                      },
+                                                      child: SizedBox(
+                                                        width: 50,
+                                                        child: Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .end,
+                                                          children: [
+                                                            Center(
+                                                              child: Container(
+                                                                width: .4,
+                                                                height: 48,
+                                                                color: const Color
+                                                                    .fromARGB(
+                                                                    255,
+                                                                    206,
+                                                                    205,
+                                                                    205),
                                                               ),
                                                             ),
-                                                          ),
-                                                        ],
+                                                            Padding(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .fromLTRB(
+                                                                      5,
+                                                                      0,
+                                                                      5,
+                                                                      0),
+                                                              child: Text(
+                                                                textAlign:
+                                                                    TextAlign
+                                                                        .center,
+                                                                String.fromCharCode(
+                                                                    Icons.search
+                                                                        .codePoint),
+                                                                style:
+                                                                    TextStyle(
+                                                                  inherit:
+                                                                      false,
+                                                                  color: ColorManager
+                                                                      .primary,
+                                                                  fontSize:
+                                                                      20.0,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w700,
+                                                                  fontFamily: Icons
+                                                                      .search
+                                                                      .fontFamily,
+                                                                  package: Icons
+                                                                      .search
+                                                                      .fontPackage,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
                                                       ),
                                                     ),
                                                   ),
-                                                ),
-                                                hintText: str.s_servicer,
-                                                hintStyle: getRegularStyle(
-                                                    color: const Color.fromARGB(
-                                                        255, 173, 173, 173),
-                                                    fontSize:
-                                                        Responsive.isMobile(
-                                                                context)
-                                                            ? 15
-                                                            : 10)),
+                                                  hintText: str.s_servicer,
+                                                  hintStyle: getRegularStyle(
+                                                      color:
+                                                          const Color.fromARGB(
+                                                              255,
+                                                              173,
+                                                              173,
+                                                              173),
+                                                      fontSize:
+                                                          Responsive.isMobile(
+                                                                  context)
+                                                              ? 15
+                                                              : 10)),
+                                            ),
                                           ),
-                                        ),
-                                      )),
+                                        )),
+                                  ),
 
                                   // * Filter icon
                                   SizedBox(

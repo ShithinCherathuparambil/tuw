@@ -1,7 +1,7 @@
-const String endPoint = "http://projects.techoriz.in/serviceapp/public";
+// const String endPoint = "http://projects.techoriz.in/serviceapp/public"; // demo url
+const String endPoint = "https://tuw.om/public";
 // const String endPoint = "https://tuw.om";
 // const String endPoint = "http://192.168.29.44:8004";
-
 const String api = "$endPoint/api";
 const String apiGet = "$endPoint/api/getall";
 const String apiUser = "$endPoint/api/user";
@@ -27,7 +27,7 @@ const String customerChildService = '$api/childservices';
 const String subServices = '$api/subservices';
 const String servicemanList = '$api/servicemanlist';
 const String placeOrderApi = '$api/place-order?';
- const String payFortpaymentSuccess = '$api/update/payment-status';
+const String payFortpaymentSuccess = '$api/update/payment-status';
 const String thawaniPaymentSuccess = '$api/payment-success';
 const String thawaniPaymentfailed = '$api/payment-failed';
 
