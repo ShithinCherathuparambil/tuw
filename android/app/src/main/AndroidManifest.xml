@@ -30,6 +30,11 @@
     <!-- Push notification permissions -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
+    <!-- SMS permissions for smart_auth -->
+    <uses-permission android:name="android.permission.RECEIVE_SMS" />
+    <uses-permission android:name="android.permission.READ_SMS" />
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID" />
+
     <application
         android:label="Tuw Services"
         android:name="${applicationName}"
@@ -66,6 +71,16 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyATbPpXTjnk535Ntl9H-2CuVk_An46zPQ0" />
+
+        <!-- SMS Retriever API receiver for smart_auth -->
+        <receiver
+            android:name="com.google.android.gms.auth.api.phone.SmsRetrieverReceiver"
+            android:exported="false"
+            android:permission="com.google.android.gms.auth.api.phone.permission.SEND">
+            <intent-filter>
+                <action android:name="com.google.android.gms.auth.api.phone.SMS_RETRIEVED" />
+            </intent-filter>
+        </receiver>
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and

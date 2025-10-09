@@ -1,7 +1,7 @@
 // ignore_for_file: avoid_print, use_build_context_synchronously
 
 import 'dart:developer';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:hive/hive.dart';
@@ -10,24 +10,51 @@ import 'package:tuw_services/API/endpoint.dart';
 import 'package:tuw_services/API/updateLocation.dart';
 import 'package:tuw_services/API/viewProfile.dart';
 import 'package:tuw_services/providers/data_provider.dart';
- import 'package:tuw_services/utils/animatedSnackBar.dart';
+import 'package:tuw_services/utils/animatedSnackBar.dart';
 import 'package:http/http.dart' as http;
 import '../l10n/app_localizations.dart';
 
 requestLocationPermission(
   BuildContext context,
 ) async {
-  LocationPermission permission = await Geolocator.checkPermission();
+  // First check if location services are enabled
+  bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
   final str = AppLocalizations.of(context)!;
+
+  if (!serviceEnabled) {
+    // Location services are disabled, show dialog to user
+    await _showLocationServiceDialog(context);
+    return;
+  }
+
+  LocationPermission permission = await Geolocator.checkPermission();
   if (permission == LocationPermission.denied) {
     permission = await Geolocator.requestPermission();
     if (permission == LocationPermission.denied) {
       print('Location permissions are denied');
+      showAnimatedSnackBar(context, str.snack_enable_loc);
     } else if (permission == LocationPermission.deniedForever) {
       print("'Location permissions are permanently denied");
       showAnimatedSnackBar(context, str.snack_enable_loc);
     } else {
       print("GPS Location service is granted");
+      try {
+        final latLon = await getCurrentLocation();
+        final location = await getPlaceAddress(latLon);
+        await updateLocationFunction(
+          context,
+          latLon,
+          location,
+        );
+        await viewProfile(context);
+      } catch (e) {
+        print('Error getting location: $e');
+        showAnimatedSnackBar(context, str.snack_enable_loc);
+      }
+    }
+  } else {
+    print("GPS Location permission granted.");
+    try {
       final latLon = await getCurrentLocation();
       final location = await getPlaceAddress(latLon);
       await updateLocationFunction(
@@ -36,49 +63,71 @@ requestLocationPermission(
         location,
       );
       await viewProfile(context);
+    } catch (e) {
+      print('Error getting location: $e');
+      if (e.toString().contains('Location services are disabled')) {
+        await _showLocationServiceDialog(context);
+      } else {
+        showAnimatedSnackBar(context, str.snack_enable_loc);
+      }
     }
-  } else {
-    print("GPS Location permission granted.");
-    final latLon = await getCurrentLocation();
-    final location = await getPlaceAddress(latLon);
-    await updateLocationFunction(
-      context,
-      latLon,
-      location,
-    );
-    await viewProfile(context);
   }
-  // searchController.text.isEmpty ? getCurrentLocation() : null;
 }
 
 requestExplorerLocationPermission(
   BuildContext context,
 ) async {
-  LocationPermission permission = await Geolocator.checkPermission();
+  // First check if location services are enabled
+  bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
   final str = AppLocalizations.of(context)!;
+
+  if (!serviceEnabled) {
+    // Location services are disabled, show dialog to user
+    await _showLocationServiceDialog(context);
+    return;
+  }
+
+  LocationPermission permission = await Geolocator.checkPermission();
   if (permission == LocationPermission.denied) {
     permission = await Geolocator.requestPermission();
     if (permission == LocationPermission.denied) {
       print('Location permissions are denied');
-      await Geolocator.openLocationSettings();
+      showAnimatedSnackBar(context, str.snack_enable_loc);
     } else if (permission == LocationPermission.deniedForever) {
       print("'Location permissions are permanently denied");
       showAnimatedSnackBar(context, str.snack_enable_loc);
     } else {
       print("GPS Location service is granted");
+      try {
+        final latLon = await getCurrentLocation();
+        final provider = Provider.of<DataProvider>(context, listen: false);
+        provider.explorerLat = latLon[0].toString();
+        provider.explorerLong = latLon[1].toString();
+      } catch (e) {
+        print('Error getting location: $e');
+        if (e.toString().contains('Location services are disabled')) {
+          await _showLocationServiceDialog(context);
+        } else {
+          showAnimatedSnackBar(context, str.snack_enable_loc);
+        }
+      }
+    }
+  } else {
+    print("GPS Location permission granted.");
+    try {
       final latLon = await getCurrentLocation();
       final provider = Provider.of<DataProvider>(context, listen: false);
       provider.explorerLat = latLon[0].toString();
       provider.explorerLong = latLon[1].toString();
+    } catch (e) {
+      print('Error getting location: $e');
+      if (e.toString().contains('Location services are disabled')) {
+        await _showLocationServiceDialog(context);
+      } else {
+        showAnimatedSnackBar(context, str.snack_enable_loc);
+      }
     }
-  } else {
-    print("GPS Location permission granted.");
-    final latLon = await getCurrentLocation();
-    final provider = Provider.of<DataProvider>(context, listen: false);
-    provider.explorerLat = latLon[0].toString();
-    provider.explorerLong = latLon[1].toString();
   }
-  // searchController.text.isEmpty ? getCurrentLocation() : null;
 }
 
 sendCurrentLocation(
@@ -182,15 +231,28 @@ Future<List<double>> getCurrentLocationPermission(
 
 Future<List<double>> getCurrentLocation() async {
   List<double> latLon = [];
-  // if (await Geolocator.isLocationServiceEnabled()) {
-  Position? position = await Geolocator.getCurrentPosition(
-      desiredAccuracy: LocationAccuracy.high);
-  double latitude = position.latitude;
-  double longitude = position.longitude;
-  latLon.addAll([latitude, longitude]);
-  // } else {
-  //   await Geolocator.openLocationSettings();
-  // }
+
+  // Check if location services are enabled
+  bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+  if (!serviceEnabled) {
+    // Location services are disabled, ask user to enable them
+    throw Exception(
+        'Location services are disabled. Please enable location services in your device settings.');
+  }
+
+  try {
+    Position? position = await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(
+      accuracy: LocationAccuracy.high,
+      distanceFilter: 100,
+    ));
+    double latitude = position.latitude;
+    double longitude = position.longitude;
+    latLon.addAll([latitude, longitude]);
+  } catch (e) {
+    print('Error getting current location: $e');
+    throw e;
+  }
 
   return latLon;
 }
@@ -226,4 +288,56 @@ String getLocationName(List<Placemark> placemarks) {
   } else {}
   print(locality);
   return locality;
+}
+
+// Dialog to ask user to enable location services
+Future<void> _showLocationServiceDialog(BuildContext context) async {
+  return showDialog<void>(
+    context: context,
+    barrierDismissible: false, // User must tap button
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Icon(
+          Icons.location_off,
+          size: 48,
+          color: Colors.red,
+        ),
+        content: SingleChildScrollView(
+          child: ListBody(
+            children: <Widget>[
+              Text(
+                'Location Services Disabled',
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'This app needs location services to work properly. Please enable location services in your device settings.',
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+        actions: <Widget>[
+          TextButton(
+            child: Text('Cancel'),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+          ElevatedButton(
+            child: Text('Open Settings'),
+            onPressed: () async {
+              Navigator.of(context).pop();
+              // Open location settings
+              await Geolocator.openLocationSettings();
+            },
+          ),
+        ],
+      );
+    },
+  );
 }

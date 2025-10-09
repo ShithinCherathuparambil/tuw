@@ -406,8 +406,6 @@ import 'package:tuw_services/utils/snack_bar.dart';
 import 'package:tuw_services/API/viewProfile.dart';
 import '../l10n/app_localizations.dart';
 import 'package:http/http.dart' as http;
-import 'package:smart_auth/smart_auth.dart';
-
 
 class OTPscreen extends StatefulWidget {
   const OTPscreen({Key? key}) : super(key: key);
@@ -422,7 +420,7 @@ class _OTPscreenState extends State<OTPscreen> with CodeAutoFill {
   String lang = '';
   String? appSignature;
   String? otpCode;
- 
+
   @override
   void initState() {
     super.initState();
@@ -439,7 +437,6 @@ class _OTPscreenState extends State<OTPscreen> with CodeAutoFill {
       });
       debugPrint("App Signature for SMS: $signature");
     });
-     
   }
 
   @override
@@ -530,9 +527,6 @@ class _OTPscreenState extends State<OTPscreen> with CodeAutoFill {
                     onCompleted: (pin) {
                       verifyNow();
                     },
-                    androidSmsAutofillMethod:
-                        AndroidSmsAutofillMethod.smsRetrieverApi,
-                    listenForMultipleSmsOnAndroid: true,
                     closeKeyboardWhenCompleted: true,
                     hapticFeedbackType: HapticFeedbackType.lightImpact,
                   ),

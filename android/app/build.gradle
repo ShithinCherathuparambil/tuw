@@ -57,9 +57,16 @@ android {
     defaultConfig {
         applicationId "com.tuwconnect.services"
         minSdkVersion flutter.minSdkVersion
-        targetSdkVersion 33
+        targetSdkVersion 36
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
+        multiDexEnabled true
+
+        // Handle receiver export requirements for API 34+
+        manifestPlaceholders = [
+            'receiverExported': 'false',
+            'applicationName': 'io.flutter.app.FlutterApplication'
+        ]
     }
 
     signingConfigs {

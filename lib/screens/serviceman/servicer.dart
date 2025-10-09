@@ -1121,18 +1121,18 @@ class _ServicerPageState extends State<ServicerPage> {
                                                                           MainAxisAlignment
                                                                               .end,
                                                                       children: [
-                                                                        InkWell(
-                                                                          onTap:
-                                                                              () {
-                                                                            final servicerProvider =
-                                                                                Provider.of<ServicerProvider>(context, listen: false);
-                                                                            ServiceControllers.mapController.clear();
-                                                                            servicerProvider.servicerLatitude =
-                                                                                null;
-                                                                          },
-                                                                          child: const Icon(
-                                                                              size: 25,
-                                                                              Icons.close),
+                                                                        Expanded(
+                                                                          child:
+                                                                              InkWell(
+                                                                            onTap:
+                                                                                () {
+                                                                              final servicerProvider = Provider.of<ServicerProvider>(context, listen: false);
+                                                                              ServiceControllers.mapController.clear();
+                                                                              servicerProvider.servicerLatitude = null;
+                                                                            },
+                                                                            child:
+                                                                                const Icon(size: 25, Icons.close),
+                                                                          ),
                                                                         ),
                                                                         InkWell(
                                                                           onTap:
