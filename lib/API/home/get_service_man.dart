@@ -50,7 +50,7 @@ Future<Position> determinePosition() async {
   return await Geolocator.getCurrentPosition();
 }
 
-getServiceMan(BuildContext context, id, homeservice) async {
+Future<void> getServiceMan(BuildContext context, id, homeservice) async {
   //  final otpProvider = Provider.of<OTPProvider>(context, listen: false);
   final provider = Provider.of<DataProvider>(context, listen: false);
   final userDetails = provider.viewProfileModel?.userdetails;
@@ -62,7 +62,16 @@ getServiceMan(BuildContext context, id, homeservice) async {
     apiToken = '';
   }
   try {
+    bool serviceEnabled = false;
     log('user details -------- ${userDetails?.latitude}');
+    // Test if location services are enabled.
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      // Location services are not enabled, open settings
+      await Geolocator.openLocationSettings();
+      return Future.error(
+          'Location services are disabled. Please enable location services in your device settings.');
+    }
     // if (userDetails?.latitude == null) {
     Position position = await determinePosition();
     log('position-------_${position.latitude}------${position.longitude}');

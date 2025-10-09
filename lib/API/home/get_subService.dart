@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
@@ -48,6 +49,7 @@ getSubService(BuildContext context, id, bool changeLan, homeService) async {
 }
 
 selectServiceType(context, id, jsonResponse, homeService) async {
+  log('selectServiceType');
   final provider = Provider.of<DataProvider>(context, listen: false);
   if (jsonResponse['type'] == 'service') {
     final subServicesData = SubServicesModel.fromJson(jsonResponse);
@@ -88,6 +90,30 @@ selectServiceType(context, id, jsonResponse, homeService) async {
   // );
   // }
   else {
-    getServiceMan(context, id, homeService);
+    log('message--2');
+    bool serviceEnabled = false;
+    // Test if location services are enabled.
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      // Location services are not enabled, open settings
+      await Geolocator.openLocationSettings();
+      serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (Navigator.canPop(context)) {
+        Navigator.pop(context);
+      }
+      if (!serviceEnabled) {
+        if (Navigator.canPop(context)) {
+          Navigator.pop(context);
+        }
+        return;
+      } else {
+        await getServiceMan(context, id, homeService);
+      }
+      if (Navigator.canPop(context)) {
+        Navigator.pop(context);
+      }
+      return;
+    }
+    await getServiceMan(context, id, homeService);
   }
 }
