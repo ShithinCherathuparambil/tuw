@@ -431,12 +431,25 @@ class _OTPscreenState extends State<OTPscreen> with CodeAutoFill {
     listenForCode();
     // _initSmsAutoFill();
 
-    SmsAutoFill().getAppSignature.then((signature) {
-      setState(() {
-        appSignature = signature;
+    // Get app signature for SMS autofill with error handling
+    try {
+      SmsAutoFill().getAppSignature.then((signature) {
+        setState(() {
+          appSignature = signature;
+        });
+        debugPrint("App Signature for SMS: $signature");
+      }).catchError((error) {
+        debugPrint("Error getting app signature in OTP: $error");
+        setState(() {
+          appSignature = "";
+        });
       });
-      debugPrint("App Signature for SMS: $signature");
-    });
+    } catch (e) {
+      debugPrint("Exception getting app signature in OTP: $e");
+      setState(() {
+        appSignature = "";
+      });
+    }
   }
 
   @override

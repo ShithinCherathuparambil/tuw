@@ -20,6 +20,7 @@ import 'package:tuw_services/components/routes_manager.dart';
 import 'package:tuw_services/providers/data_provider.dart';
 import 'package:tuw_services/API/viewProfile.dart';
 import 'package:tuw_services/utils/getLocalLanguage.dart';
+import 'package:tuw_services/utils/get_location.dart';
 
 Future<void> initPlatformState(BuildContext context) async {
   final provider = Provider.of<DataProvider>(context, listen: false);
@@ -48,6 +49,16 @@ Future<void> initPlatformState(BuildContext context) async {
   //   Navigator.pushNamed(context, Routes.noConnectionPage);
   //   return;
   // }
+
+  // Request location permission early in the app lifecycle
+  print("Requesting location permission after splash screen...");
+  try {
+    bool permissionGranted = await requestEarlyLocationPermission();
+    print("Location permission request completed. Granted: $permissionGranted");
+  } catch (e) {
+    print("Location permission request failed: $e");
+    // Continue with app flow even if location permission fails
+  }
 
   if (apiToken == null) {
     log("API token is null");

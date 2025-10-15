@@ -14,40 +14,84 @@ import 'package:tuw_services/providers/servicer_provider.dart';
 import 'package:tuw_services/screens/serviceman/servicer.dart';
 
 Future<Position> determinePosition() async {
-  bool serviceEnabled;
-  LocationPermission permission;
+  // Step 1: Check current permission status first
+  LocationPermission permission = LocationPermission.denied;
+  bool pluginAvailable = true;
 
-  // Test if location services are enabled.
-  serviceEnabled = await Geolocator.isLocationServiceEnabled();
-  if (!serviceEnabled) {
-    // Location services are not enabled, open settings
-    await Geolocator.openLocationSettings();
-    return Future.error(
-        'Location services are disabled. Please enable location services in your device settings.');
+  try {
+    permission = await Geolocator.checkPermission();
+    print("Current location permission in determinePosition: $permission");
+  } catch (e) {
+    print("Error checking location permission in determinePosition: $e");
+    if (e.toString().contains('MissingPluginException')) {
+      print(
+          "Permission check failed in determinePosition - plugin not available");
+      pluginAvailable = false;
+      return Future.error('Location plugin not available in release mode');
+    }
+    permission = LocationPermission.denied;
   }
 
-  permission = await Geolocator.checkPermission();
-  if (permission == LocationPermission.denied) {
-    permission = await Geolocator.requestPermission();
-    if (permission == LocationPermission.denied) {
-      // Permissions are denied, next time you could try
-      // requesting permissions again (this is also where
-      // Android's shouldShowRequestPermissionRationale
-      // returned true. According to Android guidelines
-      // your App should show an explanatory UI now.
-      return Future.error('Location permissions are denied');
+  // Step 2: Request permission if not granted
+  if (permission == LocationPermission.denied && pluginAvailable) {
+    try {
+      print("Requesting location permission in determinePosition...");
+      permission = await Geolocator.requestPermission();
+      print("Permission request result in determinePosition: $permission");
+    } catch (e) {
+      print("Error requesting location permission in determinePosition: $e");
+      if (e.toString().contains('MissingPluginException')) {
+        print(
+            "Permission request failed in determinePosition - plugin not available");
+        return Future.error('Location plugin not available in release mode');
+      }
+      permission = LocationPermission.denied;
     }
   }
 
+  // Step 3: Handle permission results
+  if (permission == LocationPermission.denied) {
+    return Future.error('Location permissions are denied');
+  }
+
   if (permission == LocationPermission.deniedForever) {
-    // Permissions are denied forever, handle appropriately.
     return Future.error(
         'Location permissions are permanently denied, we cannot request permissions.');
   }
 
-  // When we reach here, permissions are granted and we can
-  // continue accessing the position of the device.
-  return await Geolocator.getCurrentPosition();
+  // Step 4: Permission granted, now check if location services are enabled
+  bool serviceEnabled = false;
+  try {
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    print("Location service enabled in determinePosition: $serviceEnabled");
+  } catch (e) {
+    print("Error checking location service status in determinePosition: $e");
+    if (e.toString().contains('MissingPluginException')) {
+      print(
+          "Location service check failed in determinePosition - plugin not available");
+      return Future.error('Location plugin not available in release mode');
+    }
+    serviceEnabled = false;
+  }
+
+  // Step 5: If location services disabled, return error
+  if (!serviceEnabled && pluginAvailable) {
+    print("Location services disabled in determinePosition");
+    return Future.error(
+        'Location services are disabled. Please enable location services in your device settings.');
+  }
+
+  // Step 6: Both permission granted and services enabled - get position
+  try {
+    print("Getting current position in determinePosition...");
+    return await Geolocator.getCurrentPosition();
+  } catch (e) {
+    print("Error getting current position in determinePosition: $e");
+    if (e.toString().contains('MissingPluginException')) {
+      return Future.error('Location plugin not available in release mode');
+    }
+    return Future.error('Error getting current position: $e');
+  }
 }
 
 Future<void> getServiceMan(BuildContext context, id, homeservice) async {
@@ -63,24 +107,51 @@ Future<void> getServiceMan(BuildContext context, id, homeservice) async {
   }
   try {
     bool serviceEnabled = false;
+    bool pluginAvailable = true;
     log('user details -------- ${userDetails?.latitude}');
-    // Test if location services are enabled.
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      // Location services are not enabled, open settings
-      await Geolocator.openLocationSettings();
-      return Future.error(
-          'Location services are disabled. Please enable location services in your device settings.');
+
+    // Test if location services are enabled with error handling.
+    try {
+      serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    } catch (e) {
+      print("Error checking location service status in getServiceMan: $e");
+      serviceEnabled = false;
+      pluginAvailable = false; // Plugin is not available
     }
-    // if (userDetails?.latitude == null) {
-    Position position = await determinePosition();
-    log('position-------_${position.latitude}------${position.longitude}');
-    userDetails?.latitude = position.latitude.toString();
-    userDetails?.longitude = position.longitude.toString();
-    // }
+
+    double latitude = 23.5859; // Default fallback coordinates (Muscat, Oman)
+    double longitude = 58.4059;
+
+    // Try to get current position if plugin is available and service is enabled
+    if (pluginAvailable && serviceEnabled) {
+      try {
+        Position position = await determinePosition();
+        log('position-------_${position.latitude}------${position.longitude}');
+        latitude = position.latitude;
+        longitude = position.longitude;
+        userDetails?.latitude = position.latitude.toString();
+        userDetails?.longitude = position.longitude.toString();
+      } catch (e) {
+        print("Error getting position in getServiceMan, using fallback: $e");
+        // Use fallback coordinates if position determination fails
+      }
+    } else {
+      print(
+          "Location plugin not available or service disabled, using fallback coordinates");
+      // Use existing user coordinates if available, otherwise use fallback
+      if (userDetails?.latitude != null && userDetails?.longitude != null) {
+        try {
+          latitude = double.parse(userDetails!.latitude!);
+          longitude = double.parse(userDetails!.longitude!);
+          log('Using existing user coordinates: $latitude, $longitude');
+        } catch (e) {
+          print("Error parsing existing coordinates, using fallback: $e");
+        }
+      }
+    }
     var response = await http.post(
         Uri.parse(
-            '$servicemanList?service_id=$id&page=1&latitude=${position.latitude}&longitude=${position.longitude}&language_id=${lanId}'),
+            '$servicemanList?service_id=$id&page=1&latitude=$latitude&longitude=$longitude&language_id=${lanId}'),
         headers: {"device-id": provider.deviceId ?? '', "api-token": apiToken});
     if (response.statusCode == 200) {
       var jsonResponse = jsonDecode(response.body);

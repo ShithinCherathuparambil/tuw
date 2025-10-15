@@ -67,6 +67,11 @@ android {
             'receiverExported': 'false',
             'applicationName': 'io.flutter.app.FlutterApplication'
         ]
+
+        // Support for 16KB page size (required for Google Play from Nov 2025)
+        ndk {
+            abiFilters 'arm64-v8a', 'armeabi-v7a', 'x86_64'
+        }
     }
 
     signingConfigs {

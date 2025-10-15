@@ -141,7 +141,7 @@ class _PaymentServicePageState extends State<PaymentServicePage> {
               iconSize: 24,
               padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
               duration: const Duration(milliseconds: 400),
-              tabBackgroundColor: ColorManager.primary.withOpacity(0.4),
+              tabBackgroundColor: ColorManager.primary.withValues(alpha: 0.4),
               color: ColorManager.black,
               tabs: [
                 GButton(
@@ -392,11 +392,11 @@ class _PaymentServicePageState extends State<PaymentServicePage> {
                                                         .styleFrom(
                                                       padding: coupenLoading
                                                           ? const EdgeInsets
-                                                                  .symmetric(
+                                                              .symmetric(
                                                               horizontal: 35,
                                                               vertical: 0)
                                                           : const EdgeInsets
-                                                                  .symmetric(
+                                                              .symmetric(
                                                               horizontal: 20,
                                                               vertical: 0),
                                                     ),
@@ -704,7 +704,7 @@ Row(
                                                       ? Padding(
                                                           padding:
                                                               const EdgeInsets
-                                                                      .fromLTRB(
+                                                                  .fromLTRB(
                                                                   0, 5, 0, 5),
                                                           child: Row(
                                                             children: [
@@ -733,7 +733,7 @@ Row(
                                                       ? Padding(
                                                           padding:
                                                               const EdgeInsets
-                                                                      .fromLTRB(
+                                                                  .fromLTRB(
                                                                   0, 5, 0, 5),
                                                           child: Row(
                                                             children: [
@@ -885,7 +885,7 @@ Row(
                                                       return Padding(
                                                         padding:
                                                             const EdgeInsets
-                                                                    .fromLTRB(
+                                                                .fromLTRB(
                                                                 0, 0, 0, 5),
                                                         child: Row(
                                                           children: [
@@ -964,7 +964,7 @@ Row(
                                                           '',
                                                       style: getRegularStyle(
                                                           color: const Color
-                                                                  .fromARGB(255,
+                                                              .fromARGB(255,
                                                               173, 173, 173),
                                                           fontSize: 16)),
                                                   const SizedBox(
@@ -1220,7 +1220,7 @@ Row(
     final provider = Provider.of<DataProvider>(context, listen: false);
     final apiToken = Hive.box("token").get('api_token');
     if (apiToken == null) return;
- final str = AppLocalizations.of(context)!;
+    final str = AppLocalizations.of(context)!;
     final fieldData = provider.viewProfileModel?.userdetails;
     log('message ================${provider.viewProfileModel?.userdetails?.regionId}');
     final firstName = ProfileServiceControllers.firstNameController.text.isEmpty
@@ -1317,8 +1317,8 @@ Row(
           if (amount == 0.0) {
             isPaymentLoading = false;
             setState(() {});
-            showAnimatedSnackBar(context, str.waiting_for_admin_apporval,timeDurationInSec: 10,
-                type: AnimatedSnackBarType.success);
+            showAnimatedSnackBar(context, str.waiting_for_admin_apporval,
+                timeDurationInSec: 10, type: AnimatedSnackBarType.success);
             Navigator.pop(context);
             Navigator.pop(context);
             if (Navigator.canPop(context)) {
@@ -1362,7 +1362,7 @@ Row(
           isPaymentLoading = false;
         });
       }
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       log('Dio error: $e');
       showAnimatedSnackBar(context, 'An error occurred, please try again.');
       setState(() {

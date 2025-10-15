@@ -47,9 +47,19 @@ class _PhoneNumberScreenState extends State<PhoneNumberScreen> {
     PhoneNumberControllers.phoneNumCon.text = '';
     countryCode = "968";
     lang = Hive.box('LocalLan').get('lang');
-    SmsAutoFill().getAppSignature.then((signature) {
-      appSignature = signature;
-    });
+    // Get app signature for SMS autofill with error handling
+    try {
+      SmsAutoFill().getAppSignature.then((signature) {
+        appSignature = signature;
+        print("App signature obtained: $signature");
+      }).catchError((error) {
+        print("Error getting app signature: $error");
+        appSignature = "";
+      });
+    } catch (e) {
+      print("Exception getting app signature: $e");
+      appSignature = "";
+    }
     r.clear();
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       final provider = Provider.of<DataProvider>(context, listen: false);
@@ -61,7 +71,11 @@ class _PhoneNumberScreenState extends State<PhoneNumberScreen> {
 
   @override
   void dispose() {
-    SmsAutoFill().unregisterListener();
+    try {
+      SmsAutoFill().unregisterListener();
+    } catch (e) {
+      print("Error unregistering SMS listener: $e");
+    }
     super.dispose();
   }
 
@@ -491,13 +505,26 @@ class _PhoneNumberScreenState extends State<PhoneNumberScreen> {
       setState(() {
         loading = true;
       });
-      appSignature = await SmsAutoFill().getAppSignature;
-      await SmsAutoFill().listenForCode();
+      // Get app signature and start listening for SMS with error handling
+      try {
+        appSignature = await SmsAutoFill().getAppSignature;
+        print("App signature for OTP: $appSignature");
+      } catch (e) {
+        print("Error getting app signature for OTP: $e");
+        appSignature = "";
+      }
+
+      try {
+        await SmsAutoFill().listenForCode();
+        print("Started listening for SMS code");
+      } catch (e) {
+        print("Error starting SMS listener: $e");
+      }
       try {
         print("Starting OTP request...");
         print("Phone: $phoneNo, Country Code: $countryCode");
         print("App Signature: $appSignature");
-        
+
         await getOtp(
           context: context,
           countryCode: countryCode,
@@ -510,7 +537,8 @@ class _PhoneNumberScreenState extends State<PhoneNumberScreen> {
         print("Error in getOtp: $e");
         // Show error to user
         if (mounted) {
-          showAnimatedSnackBar(context, "Failed to send OTP. Please try again.");
+          showAnimatedSnackBar(
+              context, "Failed to send OTP. Please try again.");
         }
       } finally {
         if (mounted) {
@@ -537,9 +565,9 @@ class _PhoneNumberScreenState extends State<PhoneNumberScreen> {
         lang = 'en';
         return;
       }
-      
+
       lang = Hive.box('LocalLan').get('lang', defaultValue: 'en');
-      
+
       // Validate the language code to ensure it's a valid ISO 639-1 language code
       // Only allow supported languages: 'en', 'hi', 'ar'
       if (lang.isEmpty || !['en', 'hi', 'ar'].contains(lang)) {
@@ -551,9 +579,9 @@ class _PhoneNumberScreenState extends State<PhoneNumberScreen> {
           print('Error updating language in Hive: $e');
         }
       }
-      
+
       if (!mounted) return;
-      
+
       try {
         MyApp.of(context).setLocale(
           Locale.fromSubtags(

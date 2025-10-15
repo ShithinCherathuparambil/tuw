@@ -117,7 +117,7 @@ class _PayPageState extends State<PayPage> {
               iconSize: 24,
               padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
               duration: const Duration(milliseconds: 400),
-              tabBackgroundColor: ColorManager.primary.withOpacity(0.4),
+              tabBackgroundColor: ColorManager.primary.withValues(alpha: 0.4),
               color: ColorManager.black,
               tabs: [
                 GButton(
@@ -344,9 +344,7 @@ class _PayPageState extends State<PayPage> {
                       ),
                     ),
                   ),
-                  SizedBox(
-                    height: 20
-                  ),
+                  SizedBox(height: 20),
                   isLoading
                       ? Container(
                           width: 200,
@@ -369,7 +367,7 @@ class _PayPageState extends State<PayPage> {
                           child: ThawaniPayBtn(
                             testMode: false,
                             buttonStyle: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.all<Color>(
+                              backgroundColor: WidgetStateProperty.all<Color>(
                                   ColorManager.primary),
                             ),
                             // api: 'rRQ26GcsZzoEhbrP2HZvLYDbn9C9et',
