@@ -26,6 +26,7 @@ Future<bool> requestEarlyLocationPermission() async {
   bool pluginAvailable = true;
 
   try {
+    await Geolocator.requestPermission();
     permission = await Geolocator.checkPermission();
     print("Current location permission: $permission");
   } catch (e) {
@@ -189,7 +190,7 @@ requestExplorerLocationPermission(
   // Step 1: Check current permission status first
   LocationPermission permission = LocationPermission.denied;
   bool pluginAvailable = true;
-  Position position = await determinePosition();
+  Position? position = await determinePosition();
   try {
     permission = await Geolocator.checkPermission();
     print("Current explorer location permission: $permission");
@@ -201,10 +202,8 @@ requestExplorerLocationPermission(
       pluginAvailable = false;
       // Set fallback coordinates for explorer
       final provider = Provider.of<DataProvider>(context, listen: false);
-      provider.explorerLat =
-          position.latitude.toString(); // Muscat, Oman latitude
-      provider.explorerLong =
-          position.longitude.toString(); // Muscat, Oman longitude
+      provider.explorerLat = '23.5859'; // Muscat, Oman latitude
+      provider.explorerLong = '58.4059'; // Muscat, Oman longitude
       return;
     }
     permission = LocationPermission.denied;
@@ -223,10 +222,8 @@ requestExplorerLocationPermission(
             "Explorer permission request failed - plugin not available, using fallback");
         // Set fallback coordinates for explorer
         final provider = Provider.of<DataProvider>(context, listen: false);
-        provider.explorerLat =
-            position.latitude.toString(); // Muscat, Oman latitude
-        provider.explorerLong =
-            position.longitude.toString(); // Muscat, Oman longitude
+        provider.explorerLat = '23.5859'; // Muscat, Oman latitude
+        provider.explorerLong = '58.4059'; // Muscat, Oman longitude
         return;
       }
       permission = LocationPermission.denied;
@@ -239,20 +236,16 @@ requestExplorerLocationPermission(
     showAnimatedSnackBar(context, str.snack_enable_loc);
     // Set fallback coordinates for explorer
     final provider = Provider.of<DataProvider>(context, listen: false);
-    provider.explorerLat =
-        position.latitude.toString(); // Muscat, Oman latitude
-    provider.explorerLong =
-        position.longitude.toString(); // Muscat, Oman longitude
+    provider.explorerLat = '23.5859'; // Muscat, Oman latitude
+    provider.explorerLong = '58.4059'; // Muscat, Oman longitude
     return;
   } else if (permission == LocationPermission.deniedForever) {
     print("Explorer location permissions are permanently denied");
     showAnimatedSnackBar(context, str.snack_enable_loc);
     // Set fallback coordinates for explorer
     final provider = Provider.of<DataProvider>(context, listen: false);
-    provider.explorerLat =
-        position.latitude.toString(); // Muscat, Oman latitude
-    provider.explorerLong =
-        position.longitude.toString(); // Muscat, Oman longitude
+    provider.explorerLat = '23.5859'; // Muscat, Oman latitude
+    provider.explorerLong = '58.4059'; // Muscat, Oman longitude
     return;
   }
 
@@ -268,10 +261,8 @@ requestExplorerLocationPermission(
           "Explorer location service check failed - plugin not available, using fallback");
       // Set fallback coordinates for explorer
       final provider = Provider.of<DataProvider>(context, listen: false);
-      provider.explorerLat =
-          position.latitude.toString(); // Muscat, Oman latitude
-      provider.explorerLong =
-          position.longitude.toString(); // Muscat, Oman longitude
+      provider.explorerLat = '23.5859'; // Muscat, Oman latitude
+      provider.explorerLong = '58.4059'; // Muscat, Oman longitude
       return;
     }
     serviceEnabled = false;
@@ -287,13 +278,18 @@ requestExplorerLocationPermission(
   // Step 6: Both permission granted and services enabled - get location
   print("Explorer GPS Location permission granted and services enabled");
   try {
-    final provider = Provider.of<DataProvider>(context, listen: false);
-    provider.explorerLat =
-        position.latitude.toString(); // Muscat, Oman latitude
-    provider.explorerLong =
-        position.longitude.toString(); // Muscat, Oman longitude
-    print(
-        "Explorer location obtained: ${provider.explorerLat}, ${provider.explorerLong}");
+    if (position != null) {
+      final provider = Provider.of<DataProvider>(context, listen: false);
+      provider.explorerLat = position.latitude.toString();
+      provider.explorerLong = position.longitude.toString();
+      print(
+          "Explorer location obtained: ${provider.explorerLat}, ${provider.explorerLong}");
+    } else {
+      print("Position is null, using fallback coordinates");
+      final provider = Provider.of<DataProvider>(context, listen: false);
+      provider.explorerLat = '23.5859'; // Muscat, Oman latitude
+      provider.explorerLong = '58.4059'; // Muscat, Oman longitude
+    }
   } catch (e) {
     print('Error getting explorer location: $e');
     if (e.toString().contains('Location services are disabled')) {
@@ -302,18 +298,25 @@ requestExplorerLocationPermission(
       showAnimatedSnackBar(context, str.snack_enable_loc);
       // Set fallback coordinates for explorer
       final provider = Provider.of<DataProvider>(context, listen: false);
-      provider.explorerLat =
-          position.latitude.toString(); // Muscat, Oman latitude
-      provider.explorerLong =
-          position.longitude.toString(); // Muscat, Oman longitude
+      provider.explorerLat = '23.5859'; // Muscat, Oman latitude
+      provider.explorerLong = '58.4059'; // Muscat, Oman longitude
     }
   }
 }
 
 sendCurrentLocation(BuildContext context) async {
-  Position position = await determinePosition();
-  final latlonString = "${position.latitude},${position.longitude}";
-  print(latlonString);
+  Position? position = await determinePosition();
+  String latlonString;
+
+  if (position != null) {
+    latlonString = "${position.latitude},${position.longitude}";
+    print("Using actual location: $latlonString");
+  } else {
+    // Use fallback coordinates if position is null
+    latlonString = "23.5859,58.4059"; // Muscat, Oman
+    print("Using fallback location: $latlonString");
+  }
+
   await sendLocation(context, latlonString);
   // searchController.text.isEmpty ? getCurrentLocation() : null;
 }
