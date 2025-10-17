@@ -51,10 +51,12 @@ Future<Position> determinePosition() async {
 
   // Step 3: Handle permission results
   if (permission == LocationPermission.denied) {
+    await Geolocator.openLocationSettings();
     return Future.error('Location permissions are denied');
   }
 
   if (permission == LocationPermission.deniedForever) {
+    await Geolocator.openLocationSettings();
     return Future.error(
         'Location permissions are permanently denied, we cannot request permissions.');
   }
@@ -106,49 +108,25 @@ Future<void> getServiceMan(BuildContext context, id, homeservice) async {
     apiToken = '';
   }
   try {
-    bool serviceEnabled = false;
-    bool pluginAvailable = true;
     log('user details -------- ${userDetails?.latitude}');
-
-    // Test if location services are enabled with error handling.
-    try {
-      serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    } catch (e) {
-      print("Error checking location service status in getServiceMan: $e");
-      serviceEnabled = false;
-      pluginAvailable = false; // Plugin is not available
-    }
 
     double latitude = 23.5859; // Default fallback coordinates (Muscat, Oman)
     double longitude = 58.4059;
 
-    // Try to get current position if plugin is available and service is enabled
-    if (pluginAvailable && serviceEnabled) {
-      try {
-        Position position = await determinePosition();
-        log('position-------_${position.latitude}------${position.longitude}');
-        latitude = position.latitude;
-        longitude = position.longitude;
-        userDetails?.latitude = position.latitude.toString();
-        userDetails?.longitude = position.longitude.toString();
-      } catch (e) {
-        print("Error getting position in getServiceMan, using fallback: $e");
-        // Use fallback coordinates if position determination fails
-      }
-    } else {
-      print(
-          "Location plugin not available or service disabled, using fallback coordinates");
-      // Use existing user coordinates if available, otherwise use fallback
-      if (userDetails?.latitude != null && userDetails?.longitude != null) {
-        try {
-          latitude = double.parse(userDetails!.latitude!);
-          longitude = double.parse(userDetails!.longitude!);
-          log('Using existing user coordinates: $latitude, $longitude');
-        } catch (e) {
-          print("Error parsing existing coordinates, using fallback: $e");
-        }
-      }
+    // Step 4: Try to get current position if everything is available
+
+    try {
+      Position position = await determinePosition();
+      log('position-------_${position.latitude}------${position.longitude}');
+      latitude = position.latitude;
+      longitude = position.longitude;
+      userDetails?.latitude = position.latitude.toString();
+      userDetails?.longitude = position.longitude.toString();
+    } catch (e) {
+      print("Error getting position in getServiceMan, using fallback: $e");
+      // Use fallback coordinates if position determination fails
     }
+
     var response = await http.post(
         Uri.parse(
             '$servicemanList?service_id=$id&page=1&latitude=$latitude&longitude=$longitude&language_id=${lanId}'),

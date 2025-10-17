@@ -91,99 +91,99 @@ selectServiceType(context, id, jsonResponse, homeService) async {
   // );
   // }
   else {
-    log('message--2');
+    await getServiceMan(context, id, homeService);
+    // log('message--2');
 
-    // Step 1: Check current permission status first
-    LocationPermission permission = LocationPermission.denied;
-    bool pluginAvailable = true;
+    // // Step 1: Check current permission status first
+    // LocationPermission permission = LocationPermission.denied;
+    // bool pluginAvailable = true;
 
-    try {
-      permission = await Geolocator.checkPermission();
-      print("Current location permission in selectServiceType: $permission");
-    } catch (e) {
-      print("Error checking location permission in selectServiceType: $e");
-      if (e.toString().contains('MissingPluginException')) {
-        print(
-            "Permission check failed in selectServiceType - plugin not available");
-        pluginAvailable = false;
-        // Continue with getServiceMan using fallback coordinates
-        await getServiceMan(context, id, homeService);
-        return;
-      }
-      permission = LocationPermission.denied;
-    }
+    // try {
+    //   permission = await Geolocator.checkPermission();
+    //   print("Current location permission in selectServiceType: $permission");
+    // } catch (e) {
+    //   print("Error checking location permission in selectServiceType: $e");
+    //   if (e.toString().contains('MissingPluginException')) {
+    //     print(
+    //         "Permission check failed in selectServiceType - plugin not available");
+    //     pluginAvailable = false;
+    //     // Continue with getServiceMan using fallback coordinates
+    //     await getServiceMan(context, id, homeService);
+    //     return;
+    //   }
+    //   permission = LocationPermission.denied;
+    // }
 
-    // Step 2: Request permission if not granted
-    if (permission == LocationPermission.denied && pluginAvailable) {
-      try {
-        print("Requesting location permission in selectServiceType...");
-        permission = await Geolocator.requestPermission();
-        print("Permission request result in selectServiceType: $permission");
-      } catch (e) {
-        print("Error requesting location permission in selectServiceType: $e");
-        if (e.toString().contains('MissingPluginException')) {
-          print(
-              "Permission request failed in selectServiceType - plugin not available");
-          // Continue with getServiceMan using fallback coordinates
-          await getServiceMan(context, id, homeService);
-          return;
-        }
-        permission = LocationPermission.denied;
-      }
-    }
+    // // Step 2: Request permission if not granted
+    // if (permission == LocationPermission.denied && pluginAvailable) {
+    //   try {
+    //     print("Requesting location permission in selectServiceType...");
+    //     permission = await Geolocator.requestPermission();
+    //     print("Permission request result in selectServiceType: $permission");
+    //   } catch (e) {
+    //     print("Error requesting location permission in selectServiceType: $e");
+    //     if (e.toString().contains('MissingPluginException')) {
+    //       print(
+    //           "Permission request failed in selectServiceType - plugin not available");
+    //       // Continue with getServiceMan using fallback coordinates
+    //       await getServiceMan(context, id, homeService);
+    //       return;
+    //     }
+    //     permission = LocationPermission.denied;
+    //   }
+    // }
 
-    // Step 3: Handle permission results
-    bool permissionGranted = (permission == LocationPermission.whileInUse ||
-        permission == LocationPermission.always);
+    // // Step 3: Handle permission results
+    // bool permissionGranted = (permission == LocationPermission.whileInUse ||
+    //     permission == LocationPermission.always);
 
-    if (!permissionGranted) {
-      print(
-          'Location permissions denied in selectServiceType, using fallback coordinates');
-      // Continue with getServiceMan using fallback coordinates
-      await getServiceMan(context, id, homeService);
-      return;
-    }
+    // if (!permissionGranted) {
+    //   print(
+    //       'Location permissions denied in selectServiceType, using fallback coordinates');
+    //   // Continue with getServiceMan using fallback coordinates
+    //   await getServiceMan(context, id, homeService);
+    //   return;
+    // }
 
-    // Step 4: Permission granted, now check if location services are enabled
-    bool serviceEnabled = false;
-    try {
-      serviceEnabled = await Geolocator.isLocationServiceEnabled();
-      print("Location service enabled in selectServiceType: $serviceEnabled");
-    } catch (e) {
-      print("Error checking location service status in selectServiceType: $e");
-      if (e.toString().contains('MissingPluginException')) {
-        print(
-            "Location service check failed in selectServiceType - plugin not available");
-        // Continue with getServiceMan using fallback coordinates
-        await getServiceMan(context, id, homeService);
-        return;
-      }
-      serviceEnabled = false;
-    }
+    // // Step 4: Permission granted, now check if location services are enabled
+    // bool serviceEnabled = false;
+    // try {
+    //   serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    //   print("Location service enabled in selectServiceType: $serviceEnabled");
+    // } catch (e) {
+    //   print("Error checking location service status in selectServiceType: $e");
+    //   if (e.toString().contains('MissingPluginException')) {
+    //     print(
+    //         "Location service check failed in selectServiceType - plugin not available");
+    //     // Continue with getServiceMan using fallback coordinates
+    //     await getServiceMan(context, id, homeService);
+    //     return;
+    //   }
+    //   serviceEnabled = false;
+    // }
 
-    print(
-        "Plugin available: $pluginAvailable, Service enabled: $serviceEnabled");
+    // print(
+    //     "Plugin available: $pluginAvailable, Service enabled: $serviceEnabled");
 
-    // Step 5: If location services disabled, show dialog to enable
-    if (!serviceEnabled && pluginAvailable) {
-      print("Location services disabled in selectServiceType - showing dialog");
-      final userWantsToOpenSettings = await showLocationServiceDialog(context);
+    // // Step 5: If location services disabled, show dialog to enable
+    // if (!serviceEnabled && pluginAvailable) {
+    //   print("Location services disabled in selectServiceType - showing dialog");
+    //   final userWantsToOpenSettings = await showLocationServiceDialog(context);
 
-      if (userWantsToOpenSettings) {
-        // User chose to open settings, check if location is now enabled
-        try {
-          serviceEnabled = await Geolocator.isLocationServiceEnabled();
-          print(
-              "Location service status after settings in selectServiceType: $serviceEnabled");
-        } catch (e) {
-          print(
-              "Error checking location service status after settings in selectServiceType: $e");
-          serviceEnabled = false;
-        }
-      }
-    }
+    //   if (userWantsToOpenSettings) {
+    //     // User chose to open settings, check if location is now enabled
+    //     try {
+    //       serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    //       print(
+    //           "Location service status after settings in selectServiceType: $serviceEnabled");
+    //     } catch (e) {
+    //       print(
+    //           "Error checking location service status after settings in selectServiceType: $e");
+    //       serviceEnabled = false;
+    //     }
+    //   }
+    // }
 
     // If plugin is not available OR service is enabled, continue with getServiceMan
-    await getServiceMan(context, id, homeService);
   }
 }

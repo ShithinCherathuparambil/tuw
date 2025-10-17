@@ -35,7 +35,7 @@ class _ServicerListTileState extends State<ServicerListTile> {
 
   @override
   Widget build(BuildContext context) {
-    List<String> s =
+    List<String> distance =
         widget.serviceman.data?[widget.index].distance.toString().split('.') ??
             [];
 
@@ -133,20 +133,22 @@ class _ServicerListTileState extends State<ServicerListTile> {
                           style: getRegularStyle(
                               color: const Color.fromARGB(255, 173, 173, 173),
                               fontSize: mob ? 12 : 8)),
-                      SizedBox(
-                        width: 5,
-                      ),
+                      SizedBox(width: 5),
                       Text("|",
                           style: getRegularStyle(
                               color: const Color.fromARGB(255, 173, 173, 173),
                               fontSize: mob ? 12 : 8)),
-                      SizedBox(
-                        width: 5,
+                      SizedBox(width: 5),
+                      Flexible(
+                        child: Text(
+                            widget.serviceman.data?[widget.index].cityName ??
+                                '',
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style: getRegularStyle(
+                                color: const Color.fromARGB(255, 173, 173, 173),
+                                fontSize: mob ? 12 : 8)),
                       ),
-                      Text(widget.serviceman.data?[widget.index].cityName ?? '',
-                          style: getRegularStyle(
-                              color: const Color.fromARGB(255, 173, 173, 173),
-                              fontSize: mob ? 12 : 8)),
                     ],
                   ),
                   const SizedBox(height: 4),
@@ -213,7 +215,7 @@ class _ServicerListTileState extends State<ServicerListTile> {
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Text(
-                                        s[0],
+                                        distance[0],
                                         // '6786',
                                         style: getMediumtStyle(
                                           color: const Color.fromARGB(

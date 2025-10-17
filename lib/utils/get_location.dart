@@ -7,6 +7,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:hive/hive.dart';
 import 'package:provider/provider.dart';
 import 'package:tuw_services/API/endpoint.dart';
+import 'package:tuw_services/API/home/get_service_man.dart';
 import 'package:tuw_services/API/updateLocation.dart';
 import 'package:tuw_services/API/viewProfile.dart';
 import 'package:tuw_services/providers/data_provider.dart';
@@ -188,7 +189,7 @@ requestExplorerLocationPermission(
   // Step 1: Check current permission status first
   LocationPermission permission = LocationPermission.denied;
   bool pluginAvailable = true;
-
+  Position position = await determinePosition();
   try {
     permission = await Geolocator.checkPermission();
     print("Current explorer location permission: $permission");
@@ -200,8 +201,10 @@ requestExplorerLocationPermission(
       pluginAvailable = false;
       // Set fallback coordinates for explorer
       final provider = Provider.of<DataProvider>(context, listen: false);
-      provider.explorerLat = '23.5859'; // Muscat, Oman latitude
-      provider.explorerLong = '58.4059'; // Muscat, Oman longitude
+      provider.explorerLat =
+          position.latitude.toString(); // Muscat, Oman latitude
+      provider.explorerLong =
+          position.longitude.toString(); // Muscat, Oman longitude
       return;
     }
     permission = LocationPermission.denied;
@@ -220,8 +223,10 @@ requestExplorerLocationPermission(
             "Explorer permission request failed - plugin not available, using fallback");
         // Set fallback coordinates for explorer
         final provider = Provider.of<DataProvider>(context, listen: false);
-        provider.explorerLat = '23.5859'; // Muscat, Oman latitude
-        provider.explorerLong = '58.4059'; // Muscat, Oman longitude
+        provider.explorerLat =
+            position.latitude.toString(); // Muscat, Oman latitude
+        provider.explorerLong =
+            position.longitude.toString(); // Muscat, Oman longitude
         return;
       }
       permission = LocationPermission.denied;
@@ -234,16 +239,20 @@ requestExplorerLocationPermission(
     showAnimatedSnackBar(context, str.snack_enable_loc);
     // Set fallback coordinates for explorer
     final provider = Provider.of<DataProvider>(context, listen: false);
-    provider.explorerLat = '23.5859'; // Muscat, Oman latitude
-    provider.explorerLong = '58.4059'; // Muscat, Oman longitude
+    provider.explorerLat =
+        position.latitude.toString(); // Muscat, Oman latitude
+    provider.explorerLong =
+        position.longitude.toString(); // Muscat, Oman longitude
     return;
   } else if (permission == LocationPermission.deniedForever) {
     print("Explorer location permissions are permanently denied");
     showAnimatedSnackBar(context, str.snack_enable_loc);
     // Set fallback coordinates for explorer
     final provider = Provider.of<DataProvider>(context, listen: false);
-    provider.explorerLat = '23.5859'; // Muscat, Oman latitude
-    provider.explorerLong = '58.4059'; // Muscat, Oman longitude
+    provider.explorerLat =
+        position.latitude.toString(); // Muscat, Oman latitude
+    provider.explorerLong =
+        position.longitude.toString(); // Muscat, Oman longitude
     return;
   }
 
@@ -259,8 +268,10 @@ requestExplorerLocationPermission(
           "Explorer location service check failed - plugin not available, using fallback");
       // Set fallback coordinates for explorer
       final provider = Provider.of<DataProvider>(context, listen: false);
-      provider.explorerLat = '23.5859'; // Muscat, Oman latitude
-      provider.explorerLong = '58.4059'; // Muscat, Oman longitude
+      provider.explorerLat =
+          position.latitude.toString(); // Muscat, Oman latitude
+      provider.explorerLong =
+          position.longitude.toString(); // Muscat, Oman longitude
       return;
     }
     serviceEnabled = false;
@@ -276,10 +287,11 @@ requestExplorerLocationPermission(
   // Step 6: Both permission granted and services enabled - get location
   print("Explorer GPS Location permission granted and services enabled");
   try {
-    final latLon = await getCurrentLocation();
     final provider = Provider.of<DataProvider>(context, listen: false);
-    provider.explorerLat = latLon[0].toString();
-    provider.explorerLong = latLon[1].toString();
+    provider.explorerLat =
+        position.latitude.toString(); // Muscat, Oman latitude
+    provider.explorerLong =
+        position.longitude.toString(); // Muscat, Oman longitude
     print(
         "Explorer location obtained: ${provider.explorerLat}, ${provider.explorerLong}");
   } catch (e) {
@@ -290,51 +302,19 @@ requestExplorerLocationPermission(
       showAnimatedSnackBar(context, str.snack_enable_loc);
       // Set fallback coordinates for explorer
       final provider = Provider.of<DataProvider>(context, listen: false);
-      provider.explorerLat = '23.5859'; // Muscat, Oman latitude
-      provider.explorerLong = '58.4059'; // Muscat, Oman longitude
+      provider.explorerLat =
+          position.latitude.toString(); // Muscat, Oman latitude
+      provider.explorerLong =
+          position.longitude.toString(); // Muscat, Oman longitude
     }
   }
 }
 
-sendCurrentLocation(
-  BuildContext context,
-) async {
-  LocationPermission permission = LocationPermission.denied;
-  try {
-    permission = await Geolocator.checkPermission();
-  } catch (e) {
-    print("Error checking location permission in sendCurrentLocation: $e");
-    permission = LocationPermission.denied;
-  }
-
-  final str = AppLocalizations.of(context)!;
-  if (permission == LocationPermission.denied) {
-    try {
-      permission = await Geolocator.requestPermission();
-    } catch (e) {
-      print("Error requesting location permission in sendCurrentLocation: $e");
-      permission = LocationPermission.denied;
-    }
-    if (permission == LocationPermission.denied) {
-      log('Location permissions are denied');
-    } else if (permission == LocationPermission.deniedForever) {
-      log("'Location permissions are permanently denied");
-      showAnimatedSnackBar(context, str.snack_enable_loc);
-    } else {
-      log("GPS Location service is granted");
-    }
-  } else {
-    log("GPS Location permission granted.");
-    final latLon = await getCurrentLocation();
-    // final location = await getPlaceAddress(latLon);
-    final latlonString = "${latLon[0]},${latLon[1]}";
-    print(latlonString);
-    await sendLocation(
-      context,
-      latlonString,
-    );
-    log("Location send");
-  }
+sendCurrentLocation(BuildContext context) async {
+  Position position = await determinePosition();
+  final latlonString = "${position.latitude},${position.longitude}";
+  print(latlonString);
+  await sendLocation(context, latlonString);
   // searchController.text.isEmpty ? getCurrentLocation() : null;
 }
 
