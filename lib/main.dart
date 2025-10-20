@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:provider/provider.dart';
+import 'package:tuw_services/API/home/get_service_man.dart';
 import 'package:tuw_services/components/routes_manager.dart';
 import 'package:tuw_services/components/theme_manager.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -16,8 +17,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:tuw_services/API/firebase_api.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  try {
+ await WidgetsFlutterBinding.ensureInitialized();
+   try {
     await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
     print("Firebase initialized successfully");
 
@@ -27,7 +28,14 @@ void main() async {
   } catch (e) {
     print("Firebase initialization failed: $e");
   }
-
+    // Delay geolocator call slightly to ensure plugin registration
+    // Future.delayed(const Duration(milliseconds: 500), () async {
+    //   try {
+    //     await determinePosition();
+    //   } catch (e) {
+    //     print("⚠️ determinePosition failed: $e");
+    //   }
+    // });
   try {
     await Hive.initFlutter();
     await Hive.openBox("LocalLan");

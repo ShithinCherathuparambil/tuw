@@ -1,36 +1,31 @@
+import java.util.Properties
+import java.io.FileInputStream
+
 plugins {
-    id "com.android.application"
-    id "kotlin-android"
-    id "dev.flutter.flutter-gradle-plugin"
-    id "com.google.gms.google-services"
+    id 'com.android.application'
+    id 'kotlin-android'
+    id 'dev.flutter.flutter-gradle-plugin'
+    id 'com.google.gms.google-services'
 }
 
 def localProperties = new Properties()
-def localPropertiesFile = rootProject.file('local.properties')
+def localPropertiesFile = rootProject.file("local.properties")
 if (localPropertiesFile.exists()) {
     localPropertiesFile.withReader('UTF-8') { reader ->
         localProperties.load(reader)
     }
 }
 
-def flutterRoot = localProperties.getProperty('flutter.sdk')
+def flutterRoot = localProperties.getProperty("flutter.sdk")
 if (flutterRoot == null) {
-    throw new GradleException("Flutter SDK not found. Define location with flutter.sdk in the local.properties file.")
+    throw new GradleException("Flutter SDK not found. Define location with flutter.sdk in local.properties.")
 }
 
-def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
-if (flutterVersionCode == null) {
-    flutterVersionCode = '1'
-}
+def flutterVersionCode = localProperties.getProperty("flutter.versionCode")?.toInteger() ?: 1
+def flutterVersionName = localProperties.getProperty("flutter.versionName") ?: "1.0"
 
-def flutterVersionName = localProperties.getProperty('flutter.versionName')
-if (flutterVersionName == null) {
-    flutterVersionName = '1.0'
-}
-
-// Load keystore properties
 def keystoreProperties = new Properties()
-def keystorePropertiesFile = rootProject.file('key.properties')
+def keystorePropertiesFile = rootProject.file("key.properties")
 if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 }
@@ -41,38 +36,31 @@ android {
     ndkVersion "27.0.12077973"
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
         coreLibraryDesugaringEnabled true
     }
 
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = "17"
     }
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
     }
 
-    defaultConfig {
-        applicationId "com.tuwconnect.services"
-        minSdkVersion flutter.minSdkVersion
-        targetSdkVersion 36
-        versionCode flutterVersionCode.toInteger()
-        versionName flutterVersionName
-        multiDexEnabled true
+defaultConfig {
+    applicationId "com.tuwconnect.services"
+    minSdk flutter.minSdkVersion
+    targetSdk 36
+    versionCode flutterVersionCode
+    versionName flutterVersionName
+    multiDexEnabled true
 
-        // Handle receiver export requirements for API 34+
-        manifestPlaceholders = [
-            'receiverExported': 'false',
-            'applicationName': 'io.flutter.app.FlutterApplication'
-        ]
-
-        // Support for 16KB page size (required for Google Play from Nov 2025)
-        ndk {
-            abiFilters 'arm64-v8a', 'armeabi-v7a', 'x86_64'
-        }
-    }
+    manifestPlaceholders = [
+        applicationName: "io.flutter.app.FlutterApplication"
+    ]
+}
 
     signingConfigs {
         release {
@@ -99,10 +87,8 @@ flutter {
 }
 
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.4'
-
-    // Force compatible androidx.core versions
-    implementation 'androidx.core:core:1.13.1'
-    implementation 'androidx.core:core-ktx:1.13.1'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${project.kotlin_version}"
+    coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:2.0.4"
+    implementation "androidx.core:core:1.13.1"
+    implementation "androidx.core:core-ktx:1.13.1"
 }

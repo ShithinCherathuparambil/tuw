@@ -29,7 +29,9 @@ class _IntroductionScreenState extends State<IntroductionScreen> {
 
   _init() async {
     await FCM.init();
-    await requestExplorerLocationPermission(context);
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp)async {
+      await requestExplorerLocationPermission(context);
+    });
   }
 
   @override

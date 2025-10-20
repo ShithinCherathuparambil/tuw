@@ -103,6 +103,7 @@ dependencies:
   shared_preferences: ^2.2.2
   sms_autofill: ^2.4.1
   dio: ^5.7.0
+  location: ^8.0.1
   # flutter_ffmpeg:
   
   
