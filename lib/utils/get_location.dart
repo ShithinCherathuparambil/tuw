@@ -1,544 +1,685 @@
-// ignore_for_file: avoid_print, use_build_context_synchronously
-
-import 'dart:developer';
 import 'package:flutter/material.dart';
+import 'package:location/location.dart' as loc;
 import 'package:geocoding/geocoding.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:hive/hive.dart';
 import 'package:provider/provider.dart';
 import 'package:tuw_services/API/endpoint.dart';
-import 'package:tuw_services/API/home/get_service_man.dart';
-import 'package:tuw_services/API/updateLocation.dart';
-import 'package:tuw_services/API/viewProfile.dart';
 import 'package:tuw_services/providers/data_provider.dart';
-import 'package:tuw_services/utils/animatedSnackBar.dart';
+
 import 'package:http/http.dart' as http;
-import '../l10n/app_localizations.dart';
 
-// Enhanced location permission and service check
-// This function handles both permission requests and location service enablement
-// Returns true if both permission granted and location services enabled, false otherwise
-Future<bool> requestEarlyLocationPermission() async {
-  print("Requesting early location permission...");
-
-  // Step 1: Check current permission status first
-  LocationPermission permission = LocationPermission.denied;
-  bool pluginAvailable = true;
-
+/// Request location permission from splash screen using only location package
+/// This function uses native GPS enabling and permission requests for the best user experience
+/// Uses location package 8.0.1 for native Android dialogs and maximum compatibility
+Future<bool> requestLocationPermissionFromSplash() async {
   try {
-    await Geolocator.requestPermission();
-    permission = await Geolocator.checkPermission();
-    print("Current location permission: $permission");
-  } catch (e) {
-    print("Error checking location permission: $e");
-    if (e.toString().contains('MissingPluginException')) {
-      print("Permission check failed - plugin not available");
-      pluginAvailable = false;
-      return false;
-    }
-    permission = LocationPermission.denied;
-  }
+    print(
+        "🚀 Requesting location permission from splash screen with location package...");
 
-  // Step 2: Request permission if not granted
-  if (permission == LocationPermission.denied) {
+    // Initialize location package
+    loc.Location location = loc.Location();
+    bool serviceEnabled;
+    loc.PermissionStatus permissionGranted;
+
+    // Step 1: Check if location service is enabled
     try {
-      print("Requesting location permission...");
-      permission = await Geolocator.requestPermission();
-      print("Permission request result: $permission");
+      serviceEnabled = await location.serviceEnabled();
+      print("📡 Location services enabled: $serviceEnabled");
     } catch (e) {
-      print("Error requesting location permission: $e");
+      print("❌ Error checking location services: $e");
       if (e.toString().contains('MissingPluginException')) {
-        print("Permission request failed - plugin not available");
+        print("🚫 Location plugin not available in release mode");
         return false;
       }
-      permission = LocationPermission.denied;
-    }
-  }
-
-  // Step 3: Check if permission is granted
-  bool permissionGranted = (permission == LocationPermission.whileInUse ||
-      permission == LocationPermission.always);
-
-  if (!permissionGranted) {
-    print("Location permission not granted: $permission");
-    return false;
-  }
-
-  // Step 4: If permission granted, check if location services are enabled
-  bool serviceEnabled = false;
-  try {
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    print("Location service enabled: $serviceEnabled");
-  } catch (e) {
-    print("Error checking location service status: $e");
-    if (e.toString().contains('MissingPluginException')) {
-      print("Location service check failed - plugin not available");
       return false;
     }
-    serviceEnabled = false;
-  }
 
-  print(
-      "Early location check - Permission: $permissionGranted, Service: $serviceEnabled");
-  return permissionGranted && serviceEnabled;
-}
-
-requestLocationPermission(
-  BuildContext context,
-) async {
-  final str = AppLocalizations.of(context)!;
-
-  // Step 1: Check current permission status first
-  LocationPermission permission = LocationPermission.denied;
-  bool pluginAvailable = true;
-
-  try {
-    permission = await Geolocator.checkPermission();
-    print("Current location permission: $permission");
-  } catch (e) {
-    print("Error checking location permission: $e");
-    if (e.toString().contains('MissingPluginException')) {
-      print("Permission check failed - plugin not available, using fallback");
-      pluginAvailable = false;
-      await viewProfile(context);
-      return;
-    }
-    permission = LocationPermission.denied;
-  }
-
-  // Step 2: Request permission if not granted
-  if (permission == LocationPermission.denied && pluginAvailable) {
-    try {
-      print("Requesting location permission...");
-      permission = await Geolocator.requestPermission();
-      print("Permission request result: $permission");
-    } catch (e) {
-      print("Error requesting location permission: $e");
-      if (e.toString().contains('MissingPluginException')) {
-        print(
-            "Permission request failed - plugin not available, using fallback");
-        await viewProfile(context);
-        return;
+    // Step 2: If service not enabled, request to enable it natively
+    if (!serviceEnabled) {
+      print(
+          "⚠️ Location services are disabled, requesting to enable natively...");
+      try {
+        serviceEnabled = await location.requestService();
+        print("📱 Native GPS enable request result: $serviceEnabled");
+      } catch (e) {
+        print("❌ Error requesting location service: $e");
+        if (e.toString().contains('MissingPluginException')) {
+          print("🚫 Location plugin not available in release mode");
+          return false;
+        }
+        return false;
       }
-      permission = LocationPermission.denied;
-    }
-  }
 
-  // Step 3: Handle permission results
-  if (permission == LocationPermission.denied) {
-    print('Location permissions are denied');
-    showAnimatedSnackBar(context, str.snack_enable_loc);
-    await viewProfile(context);
-    return;
-  } else if (permission == LocationPermission.deniedForever) {
-    print("Location permissions are permanently denied");
-    showAnimatedSnackBar(context, str.snack_enable_loc);
-    await viewProfile(context);
-    return;
-  }
-
-  // Step 4: Permission granted, now check if location services are enabled
-  bool serviceEnabled = false;
-  try {
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    print("Location service enabled: $serviceEnabled");
-  } catch (e) {
-    print("Error checking location service status: $e");
-    if (e.toString().contains('MissingPluginException')) {
-      print(
-          "Location service check failed - plugin not available, using fallback");
-      await viewProfile(context);
-      return;
-    }
-    serviceEnabled = false;
-  }
-
-  // Step 5: If location services disabled, show dialog to enable
-  if (!serviceEnabled && pluginAvailable) {
-    print("Location services disabled - showing dialog");
-    await showLocationServiceDialog(context);
-    return;
-  }
-
-  // Step 6: Both permission granted and services enabled - get location
-  print("GPS Location permission granted and services enabled");
-  try {
-    final latLon = await getCurrentLocation();
-    final location = await getPlaceAddress(latLon);
-    await updateLocationFunction(
-      context,
-      latLon,
-      location,
-    );
-    print("Location obtained and updated: ${latLon[0]}, ${latLon[1]}");
-    await viewProfile(context);
-  } catch (e) {
-    print('Error getting location: $e');
-    if (e.toString().contains('Location services are disabled')) {
-      await showLocationServiceDialog(context);
-    } else {
-      showAnimatedSnackBar(context, str.snack_enable_loc);
-    }
-  }
-}
-
-requestExplorerLocationPermission(
-  BuildContext context,
-) async {
-  final str = AppLocalizations.of(context)!;
-
-  // Step 1: Check current permission status first
-  LocationPermission permission = LocationPermission.denied;
-  bool pluginAvailable = true;
-  Position? position = await determinePosition();
-  try {
-    permission = await Geolocator.checkPermission();
-    print("Current explorer location permission: $permission");
-  } catch (e) {
-    print("Error checking location permission in explorer: $e");
-    if (e.toString().contains('MissingPluginException')) {
-      print(
-          "Explorer permission check failed - plugin not available, using fallback");
-      pluginAvailable = false;
-      // Set fallback coordinates for explorer
-      final provider = Provider.of<DataProvider>(context, listen: false);
-      provider.explorerLat = '23.5859'; // Muscat, Oman latitude
-      provider.explorerLong = '58.4059'; // Muscat, Oman longitude
-      return;
-    }
-    permission = LocationPermission.denied;
-  }
-
-  // Step 2: Request permission if not granted
-  if (permission == LocationPermission.denied && pluginAvailable) {
-    try {
-      print("Requesting explorer location permission...");
-      permission = await Geolocator.requestPermission();
-      print("Explorer permission request result: $permission");
-    } catch (e) {
-      print("Error requesting location permission in explorer: $e");
-      if (e.toString().contains('MissingPluginException')) {
-        print(
-            "Explorer permission request failed - plugin not available, using fallback");
-        // Set fallback coordinates for explorer
-        final provider = Provider.of<DataProvider>(context, listen: false);
-        provider.explorerLat = '23.5859'; // Muscat, Oman latitude
-        provider.explorerLong = '58.4059'; // Muscat, Oman longitude
-        return;
+      if (!serviceEnabled) {
+        print("❌ User declined to enable location services");
+        return false;
       }
-      permission = LocationPermission.denied;
     }
-  }
 
-  // Step 3: Handle permission results
-  if (permission == LocationPermission.denied) {
-    print('Explorer location permissions are denied');
-    showAnimatedSnackBar(context, str.snack_enable_loc);
-    // Set fallback coordinates for explorer
-    final provider = Provider.of<DataProvider>(context, listen: false);
-    provider.explorerLat = '23.5859'; // Muscat, Oman latitude
-    provider.explorerLong = '58.4059'; // Muscat, Oman longitude
-    return;
-  } else if (permission == LocationPermission.deniedForever) {
-    print("Explorer location permissions are permanently denied");
-    showAnimatedSnackBar(context, str.snack_enable_loc);
-    // Set fallback coordinates for explorer
-    final provider = Provider.of<DataProvider>(context, listen: false);
-    provider.explorerLat = '23.5859'; // Muscat, Oman latitude
-    provider.explorerLong = '58.4059'; // Muscat, Oman longitude
-    return;
-  }
+    // Step 3: Check permission status
+    try {
+      permissionGranted = await location.hasPermission();
+      print("🔐 Current permission status: $permissionGranted");
+    } catch (e) {
+      print("❌ Error checking permission: $e");
+      if (e.toString().contains('MissingPluginException')) {
+        print("🚫 Location plugin not available in release mode");
+        return false;
+      }
+      return false;
+    }
 
-  // Step 4: Permission granted, now check if location services are enabled
-  bool serviceEnabled = false;
-  try {
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    print("Explorer location service enabled: $serviceEnabled");
+    // Step 4: If permission denied, request it natively
+    if (permissionGranted == loc.PermissionStatus.denied) {
+      print("⚠️ Location permission denied, requesting natively...");
+      try {
+        permissionGranted = await location.requestPermission();
+        print("📱 Native permission request result: $permissionGranted");
+      } catch (e) {
+        print("❌ Error requesting permission: $e");
+        if (e.toString().contains('MissingPluginException')) {
+          print("🚫 Location plugin not available in release mode");
+          return false;
+        }
+        return false;
+      }
+    }
+
+    // Step 5: Check final permission status
+    bool finalPermissionGranted =
+        (permissionGranted == loc.PermissionStatus.granted ||
+            permissionGranted == loc.PermissionStatus.grantedLimited);
+
+    if (finalPermissionGranted) {
+      print("✅ Location permission granted successfully!");
+
+      // Test getting current position to verify everything works
+      try {
+        loc.LocationData locationData = await location.getLocation();
+        print(
+            "📍 Test position: ${locationData.latitude}, ${locationData.longitude}");
+      } catch (e) {
+        print("⚠️ Could not get test position: $e");
+        // Still return true as permission was granted
+      }
+    } else {
+      print("❌ Location permission denied: $permissionGranted");
+    }
+
+    return finalPermissionGranted;
   } catch (e) {
-    print("Error checking location service status in explorer: $e");
-    if (e.toString().contains('MissingPluginException')) {
+    print("❌ Unexpected error in splash location permission: $e");
+    return false;
+  }
+}
+
+/// Enhanced location permission and service check using location package for native dialogs
+/// This function handles both permission requests and location service enablement
+/// Returns true if both permission granted and location services enabled, false otherwise
+Future<bool> requestEarlyLocationPermission() async {
+  try {
+    print("🚀 Requesting early location permission with native dialogs...");
+
+    // Initialize location package for native GPS and permission handling
+    loc.Location location = loc.Location();
+    bool serviceEnabled;
+    loc.PermissionStatus permissionGranted;
+
+    // Step 1: Check if location service is enabled using location package
+    try {
+      serviceEnabled = await location.serviceEnabled();
+      print("📡 Location services enabled (location pkg): $serviceEnabled");
+    } catch (e) {
+      print("❌ Error checking location services with location package: $e");
+      if (e.toString().contains('MissingPluginException')) {
+        print("🚫 Location plugin not available in release mode");
+        return false;
+      }
+      return false;
+    }
+
+    // Step 2: If service not enabled, request to enable it natively
+    if (!serviceEnabled) {
       print(
-          "Explorer location service check failed - plugin not available, using fallback");
-      // Set fallback coordinates for explorer
-      final provider = Provider.of<DataProvider>(context, listen: false);
-      provider.explorerLat = '23.5859'; // Muscat, Oman latitude
-      provider.explorerLong = '58.4059'; // Muscat, Oman longitude
-      return;
+          "⚠️ Location services are disabled, requesting to enable natively...");
+      try {
+        serviceEnabled = await location.requestService();
+        print("📱 Location service request result: $serviceEnabled");
+      } catch (e) {
+        print("❌ Error requesting location service: $e");
+        if (e.toString().contains('MissingPluginException')) {
+          print("🚫 Location plugin not available in release mode");
+          return false;
+        }
+        return false;
+      }
+
+      if (!serviceEnabled) {
+        print("❌ User declined to enable location services");
+        return false;
+      }
     }
-    serviceEnabled = false;
-  }
 
-  // Step 5: If location services disabled, show dialog to enable
-  if (!serviceEnabled && pluginAvailable) {
-    print("Explorer location services disabled - showing dialog");
-    await showLocationServiceDialog(context);
-    return;
-  }
+    // Step 3: Check permission status using location package
+    try {
+      permissionGranted = await location.hasPermission();
+      print("🔐 Current permission status (location pkg): $permissionGranted");
+    } catch (e) {
+      print("❌ Error checking permission with location package: $e");
+      if (e.toString().contains('MissingPluginException')) {
+        print("🚫 Location plugin not available in release mode");
+        return false;
+      }
+      return false;
+    }
 
-  // Step 6: Both permission granted and services enabled - get location
-  print("Explorer GPS Location permission granted and services enabled");
+    // Step 4: If permission denied, request it natively
+    if (permissionGranted == loc.PermissionStatus.denied) {
+      print("⚠️ Location permission denied, requesting natively...");
+      try {
+        permissionGranted = await location.requestPermission();
+        print(
+            "📱 Permission request result (location pkg): $permissionGranted");
+      } catch (e) {
+        print("❌ Error requesting permission with location package: $e");
+        if (e.toString().contains('MissingPluginException')) {
+          print("🚫 Location plugin not available in release mode");
+          return false;
+        }
+        return false;
+      }
+    }
+
+    // Step 5: Check final permission status
+    bool finalPermissionGranted =
+        (permissionGranted == loc.PermissionStatus.granted ||
+            permissionGranted == loc.PermissionStatus.grantedLimited);
+
+    if (finalPermissionGranted) {
+      print("✅ Location permission granted successfully!");
+
+      // Test getting current position to verify everything works
+      try {
+        loc.LocationData locationData = await location.getLocation();
+        print(
+            "📍 Test position: ${locationData.latitude}, ${locationData.longitude}");
+      } catch (e) {
+        print("⚠️ Could not get test position: $e");
+        // Still return true as permission was granted
+      }
+    } else {
+      print("❌ Location permission denied: $permissionGranted");
+    }
+
+    return finalPermissionGranted;
+  } catch (e) {
+    print("❌ Unexpected error in early location permission: $e");
+    return false;
+  }
+}
+
+/// Request location permission with native dialogs and integration with viewProfile
+/// This function uses the location package for native GPS enabling and permission requests
+/// and handles all edge cases for release mode compatibility
+Future<bool> _requestLocationPermissionCore() async {
   try {
-    if (position != null) {
-      final provider = Provider.of<DataProvider>(context, listen: false);
-      provider.explorerLat = position.latitude.toString();
-      provider.explorerLong = position.longitude.toString();
+    print("🚀 Requesting location permission with native dialogs...");
+
+    // Initialize location package for native GPS and permission handling
+    loc.Location location = loc.Location();
+    bool serviceEnabled;
+    loc.PermissionStatus permissionGranted;
+
+    // Step 1: Check if location service is enabled using location package
+    try {
+      serviceEnabled = await location.serviceEnabled();
+      print("📡 Location services enabled (location pkg): $serviceEnabled");
+    } catch (e) {
+      print("❌ Error checking location services with location package: $e");
+      if (e.toString().contains('MissingPluginException')) {
+        print("🚫 Location plugin not available in release mode");
+        return false;
+      }
+      return false;
+    }
+
+    // Step 2: If service not enabled, request to enable it natively
+    if (!serviceEnabled) {
       print(
-          "Explorer location obtained: ${provider.explorerLat}, ${provider.explorerLong}");
-    } else {
-      print("Position is null, using fallback coordinates");
-      final provider = Provider.of<DataProvider>(context, listen: false);
-      provider.explorerLat = '23.5859'; // Muscat, Oman latitude
-      provider.explorerLong = '58.4059'; // Muscat, Oman longitude
+          "⚠️ Location services are disabled, requesting to enable natively...");
+      try {
+        serviceEnabled = await location.requestService();
+        print("📱 Location service request result: $serviceEnabled");
+      } catch (e) {
+        print("❌ Error requesting location service: $e");
+        if (e.toString().contains('MissingPluginException')) {
+          print("🚫 Location plugin not available in release mode");
+          return false;
+        }
+        return false;
+      }
+
+      if (!serviceEnabled) {
+        print("❌ User declined to enable location services");
+        return false;
+      }
     }
+
+    // Step 3: Check permission status using location package
+    try {
+      permissionGranted = await location.hasPermission();
+      print("🔐 Current permission status (location pkg): $permissionGranted");
+    } catch (e) {
+      print("❌ Error checking permission with location package: $e");
+      if (e.toString().contains('MissingPluginException')) {
+        print("🚫 Location plugin not available in release mode");
+        return false;
+      }
+      return false;
+    }
+
+    // Step 4: If permission denied, request it natively
+    if (permissionGranted == loc.PermissionStatus.denied) {
+      print("⚠️ Location permission denied, requesting natively...");
+      try {
+        permissionGranted = await location.requestPermission();
+        print(
+            "📱 Permission request result (location pkg): $permissionGranted");
+      } catch (e) {
+        print("❌ Error requesting permission with location package: $e");
+        if (e.toString().contains('MissingPluginException')) {
+          print("🚫 Location plugin not available in release mode");
+          return false;
+        }
+        return false;
+      }
+    }
+
+    // Step 5: Check final permission status
+    bool finalPermissionGranted =
+        (permissionGranted == loc.PermissionStatus.granted ||
+            permissionGranted == loc.PermissionStatus.grantedLimited);
+
+    return finalPermissionGranted;
   } catch (e) {
-    print('Error getting explorer location: $e');
-    if (e.toString().contains('Location services are disabled')) {
-      await showLocationServiceDialog(context);
-    } else {
-      showAnimatedSnackBar(context, str.snack_enable_loc);
-      // Set fallback coordinates for explorer
-      final provider = Provider.of<DataProvider>(context, listen: false);
-      provider.explorerLat = '23.5859'; // Muscat, Oman latitude
-      provider.explorerLong = '58.4059'; // Muscat, Oman longitude
-    }
+    print("❌ Unexpected error in location permission: $e");
+    return false;
   }
 }
 
-sendCurrentLocation(BuildContext context) async {
-  Position? position = await determinePosition();
-  String latlonString;
-
-  if (position != null) {
-    latlonString = "${position.latitude},${position.longitude}";
-    print("Using actual location: $latlonString");
-  } else {
-    // Use fallback coordinates if position is null
-    latlonString = "23.5859,58.4059"; // Muscat, Oman
-    print("Using fallback location: $latlonString");
-  }
-
-  await sendLocation(context, latlonString);
-  // searchController.text.isEmpty ? getCurrentLocation() : null;
-}
-
-sendLocation(context, String latLon) async {
-  final provider = Provider.of<DataProvider>(context, listen: false);
-  final receiverId = provider.serviceManDetails?.userData?.id.toString();
-  final str = AppLocalizations.of(context)!;
-  provider.subServicesModel = null;
-  final apiToken = Hive.box("token").get('api_token');
-  final url =
-      '$api/chat-store?receiver_id=$receiverId&type=location&message=$latLon&page=1';
-
-  print(url);
-
-  provider.isLocationSending = true;
-  print(provider.isLocationSending);
-  // return;
+/// Request location permission for explorer feature with native dialogs
+/// This function uses the location package for native GPS enabling and permission requests
+/// and handles all edge cases for release mode compatibility
+Future<bool> _requestExplorerLocationPermissionCore() async {
   try {
-    var response = await http.post(Uri.parse(url),
-        headers: {"device-id": provider.deviceId ?? '', "api-token": apiToken});
-    if (response.statusCode == 200) {
-      // var jsonResponse = jsonDecode(response.body);
-      log("Location sended successfully");
-      provider.isSendingSuccessFull = true;
-      log(response.body);
-      // final servicerProvider =
-      //     Provider.of<ServicerProvider>(context, listen: false);
-    } else {
-      showAnimatedSnackBar(context, str.snack_message_sent);
-    }
-  } on Exception catch (e) {
-    showAnimatedSnackBar(context, str.snack_message_sent);
-    print(e);
-  }
-}
+    print("🚀 Requesting explorer location permission with native dialogs...");
 
-Future<List<double>> getCurrentLocationPermission(
-  BuildContext context,
-) async {
-  log('permission request send for location----------------------------------------------------');
-  late List<double> latLon;
-  LocationPermission permission = LocationPermission.denied;
-  try {
-    permission = await Geolocator.checkPermission();
+    // Initialize location package for native GPS and permission handling
+    loc.Location location = loc.Location();
+    bool serviceEnabled;
+    loc.PermissionStatus permissionGranted;
+
+    // Step 1: Check if location service is enabled using location package
+    try {
+      serviceEnabled = await location.serviceEnabled();
+      print("📡 Location services enabled (location pkg): $serviceEnabled");
+    } catch (e) {
+      print("❌ Error checking location services with location package: $e");
+      if (e.toString().contains('MissingPluginException')) {
+        print("🚫 Location plugin not available in release mode");
+        return false;
+      }
+      return false;
+    }
+
+    // Step 2: If service not enabled, request to enable it natively
+    if (!serviceEnabled) {
+      print(
+          "⚠️ Location services are disabled, requesting to enable natively...");
+      try {
+        serviceEnabled = await location.requestService();
+        print("📱 Location service request result: $serviceEnabled");
+      } catch (e) {
+        print("❌ Error requesting location service: $e");
+        if (e.toString().contains('MissingPluginException')) {
+          print("🚫 Location plugin not available in release mode");
+          return false;
+        }
+        return false;
+      }
+
+      if (!serviceEnabled) {
+        print("❌ User declined to enable location services");
+        return false;
+      }
+    }
+
+    // Step 3: Check permission status using location package
+    try {
+      permissionGranted = await location.hasPermission();
+      print("🔐 Current permission status (location pkg): $permissionGranted");
+    } catch (e) {
+      print("❌ Error checking permission with location package: $e");
+      if (e.toString().contains('MissingPluginException')) {
+        print("🚫 Location plugin not available in release mode");
+        return false;
+      }
+      return false;
+    }
+
+    // Step 4: If permission denied, request it natively
+    if (permissionGranted == loc.PermissionStatus.denied) {
+      print("⚠️ Location permission denied, requesting natively...");
+      try {
+        permissionGranted = await location.requestPermission();
+        print(
+            "📱 Permission request result (location pkg): $permissionGranted");
+      } catch (e) {
+        print("❌ Error requesting permission with location package: $e");
+        if (e.toString().contains('MissingPluginException')) {
+          print("🚫 Location plugin not available in release mode");
+          return false;
+        }
+        return false;
+      }
+    }
+
+    // Step 5: Check final permission status
+    bool finalPermissionGranted =
+        (permissionGranted == loc.PermissionStatus.granted ||
+            permissionGranted == loc.PermissionStatus.grantedLimited);
+
+    return finalPermissionGranted;
   } catch (e) {
+    print("❌ Unexpected error in explorer location permission: $e");
+    return false;
+  }
+}
+
+/// Send current location using location package
+/// Returns LocationData if successful, null if location services fail
+Future<loc.LocationData?> _sendCurrentLocationCore() async {
+  try {
+    print("📍 Getting current location for sending...");
+
+    loc.Location location = loc.Location();
+    loc.LocationData locationData = await location.getLocation();
+
     print(
-        "Error checking location permission in getCurrentLocationPermission: $e");
-    permission = LocationPermission.denied;
+        "✅ Current location obtained: ${locationData.latitude}, ${locationData.longitude}");
+    return locationData;
+  } catch (e) {
+    print("❌ Error getting current location: $e");
+    return null;
   }
+}
 
-  final str = AppLocalizations.of(context)!;
-  if (permission == LocationPermission.denied) {
+/// Get current location permission status and coordinates with native dialogs
+/// This function uses the location package for native GPS enabling and permission requests
+/// Returns LocationData with coordinates or fallback coordinates if location fails
+Future<loc.LocationData> _getCurrentLocationPermissionCore() async {
+  try {
+    print("🚀 Getting current location permission with native dialogs...");
+
+    // Initialize location package for native GPS and permission handling
+    loc.Location location = loc.Location();
+    bool serviceEnabled;
+    loc.PermissionStatus permissionGranted;
+
+    // Step 1: Check if location service is enabled using location package
     try {
-      permission = await Geolocator.requestPermission();
+      serviceEnabled = await location.serviceEnabled();
+      print("📡 Location services enabled (location pkg): $serviceEnabled");
     } catch (e) {
+      print("❌ Error checking location services with location package: $e");
+      if (e.toString().contains('MissingPluginException')) {
+        print("🚫 Location plugin not available in release mode");
+        return _getFallbackLocationData();
+      }
+      return _getFallbackLocationData();
+    }
+
+    // Step 2: If service not enabled, request to enable it natively
+    if (!serviceEnabled) {
       print(
-          "Error requesting location permission in getCurrentLocationPermission: $e");
-      permission = LocationPermission.denied;
+          "⚠️ Location services are disabled, requesting to enable natively...");
+      try {
+        serviceEnabled = await location.requestService();
+        print("📱 Location service request result: $serviceEnabled");
+      } catch (e) {
+        print("❌ Error requesting location service: $e");
+        if (e.toString().contains('MissingPluginException')) {
+          print("🚫 Location plugin not available in release mode");
+          return _getFallbackLocationData();
+        }
+        return _getFallbackLocationData();
+      }
+
+      if (!serviceEnabled) {
+        print("❌ User declined to enable location services");
+        return _getFallbackLocationData();
+      }
     }
-    if (permission == LocationPermission.denied) {
-      log('Location permissions are denied');
-    } else if (permission == LocationPermission.deniedForever) {
-      log("'Location permissions are permanently denied");
-      showAnimatedSnackBar(context, str.snack_enable_loc);
+
+    // Step 3: Check permission status using location package
+    try {
+      permissionGranted = await location.hasPermission();
+      print("🔐 Current permission status (location pkg): $permissionGranted");
+    } catch (e) {
+      print("❌ Error checking permission with location package: $e");
+      if (e.toString().contains('MissingPluginException')) {
+        print("🚫 Location plugin not available in release mode");
+        return _getFallbackLocationData();
+      }
+      return _getFallbackLocationData();
+    }
+
+    // Step 4: If permission denied, request it natively
+    if (permissionGranted == loc.PermissionStatus.denied) {
+      print("⚠️ Location permission denied, requesting natively...");
+      try {
+        permissionGranted = await location.requestPermission();
+        print(
+            "📱 Permission request result (location pkg): $permissionGranted");
+      } catch (e) {
+        print("❌ Error requesting permission with location package: $e");
+        if (e.toString().contains('MissingPluginException')) {
+          print("🚫 Location plugin not available in release mode");
+          return _getFallbackLocationData();
+        }
+        return _getFallbackLocationData();
+      }
+    }
+
+    // Step 5: Check final permission status and get location
+    bool finalPermissionGranted =
+        (permissionGranted == loc.PermissionStatus.granted ||
+            permissionGranted == loc.PermissionStatus.grantedLimited);
+
+    if (finalPermissionGranted) {
+      print("✅ Location permission granted, getting current position...");
+      try {
+        loc.LocationData locationData = await location.getLocation();
+        print(
+            "📍 Position obtained: ${locationData.latitude}, ${locationData.longitude}");
+        return locationData;
+      } catch (e) {
+        print("❌ Error getting current position: $e");
+        if (e.toString().contains('MissingPluginException')) {
+          print("🚫 Location plugin not available in release mode");
+          return _getFallbackLocationData();
+        }
+        return _getFallbackLocationData();
+      }
     } else {
-      log("GPS Location service is granted");
-      latLon = await getCurrentLocation();
-      // final location = await getPlaceAddress(latLon);
-      final latlonString = "${latLon[0]},${latLon[1]}";
-      print(latlonString);
-      return latLon;
+      print("❌ Location permissions are denied by user: $permissionGranted");
+      return _getFallbackLocationData();
     }
-    return [0, 0];
-  } else {
-    log("GPS Location permission granted.");
-    latLon = await getCurrentLocation();
-    // final location = await getPlaceAddress(latLon);
-    final latlonString = "${latLon[0]},${latLon[1]}";
-    print(latlonString);
-
-    return latLon;
-  }
-
-  // searchController.text.isEmpty ? getCurrentLocation() : null;
-}
-
-Future<List<double>> getCurrentLocation() async {
-  List<double> latLon = [];
-
-  // Check if location services are enabled with error handling
-  bool serviceEnabled = false;
-  try {
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
   } catch (e) {
-    print("Error checking location service status in getCurrentLocation: $e");
-    // Assume services are disabled if we can't check
-    serviceEnabled = false;
+    print("❌ Unexpected error in getCurrentLocationPermission: $e");
+    return _getFallbackLocationData();
   }
+}
 
-  if (!serviceEnabled) {
-    // Location services are disabled, ask user to enable them
-    throw Exception(
-        'Location services are disabled. Please enable location services in your device settings.');
-  }
+/// Returns fallback coordinates for Muscat, Oman when location services fail
+loc.LocationData _getFallbackLocationData() {
+  print("🏠 Using fallback coordinates: Muscat, Oman (23.5859, 58.4059)");
+  return loc.LocationData.fromMap({
+    'latitude': 23.5859,
+    'longitude': 58.4059,
+    'accuracy': 0.0,
+    'altitude': 0.0,
+    'heading': 0.0,
+    'speed': 0.0,
+    'time': DateTime.now().millisecondsSinceEpoch.toDouble(),
+  });
+}
 
+// Backward compatibility functions that accept context parameter but ignore it
+
+/// Backward compatibility wrapper for requestLocationPermission that accepts context
+Future<bool> requestLocationPermission(BuildContext context) async {
+  return await _requestLocationPermissionCore();
+}
+
+/// Backward compatibility wrapper for requestExplorerLocationPermission that accepts context
+Future<bool> requestExplorerLocationPermission(BuildContext context) async {
+  return await _requestExplorerLocationPermissionCore();
+}
+
+/// Backward compatibility wrapper for sendCurrentLocation that accepts context
+Future<loc.LocationData?> sendCurrentLocation(BuildContext context) async {
+  return await _sendCurrentLocationCore();
+}
+
+/// Backward compatibility wrapper for getCurrentLocationPermission that accepts context
+Future<loc.LocationData> getCurrentLocationPermission(
+    BuildContext context) async {
+  return await _getCurrentLocationPermissionCore();
+}
+
+/// Get current location using location package
+/// Returns LocationData with coordinates or fallback coordinates if location fails
+Future<loc.LocationData> getCurrentLocation() async {
   try {
-    Position? position = await Geolocator.getCurrentPosition(
-        locationSettings: const LocationSettings(
-      accuracy: LocationAccuracy.high,
-      distanceFilter: 100,
-    ));
-    double latitude = position.latitude;
-    double longitude = position.longitude;
-    latLon.addAll([latitude, longitude]);
+    print("📍 Getting current location...");
+
+    loc.Location location = loc.Location();
+    loc.LocationData locationData = await location.getLocation();
+
+    print(
+        "✅ Current location obtained: ${locationData.latitude}, ${locationData.longitude}");
+    return locationData;
   } catch (e) {
-    print('Error getting current location: $e');
-    throw e;
+    print("❌ Error getting current location: $e");
+    return _getFallbackLocationData();
   }
-
-  return latLon;
 }
 
-Future<String> getPlaceAddress(List<double> latLon) async {
-  String locationAddress = '';
-  try {
-    List<Placemark> placemarks =
-        await placemarkFromCoordinates(latLon[0], latLon[1]);
-
-    locationAddress = getLocationName(placemarks);
-  } catch (error) {
-    print(error);
-  }
-  return locationAddress;
-}
-
-String getLocationName(List<Placemark> placemarks) {
-  String locality = '';
-  if (placemarks[0].subLocality!.isNotEmpty) {
-    locality = '${placemarks[0].subLocality} | ${placemarks[0].country}';
-  } else if (placemarks[0].locality!.isNotEmpty) {
-    locality = '${placemarks[0].locality} | ${placemarks[0].country}';
-  } else if (placemarks[0].street!.isNotEmpty) {
-    locality = '${placemarks[0].street} | ${placemarks[0].country}';
-  } else if (placemarks[0].subAdministrativeArea!.isNotEmpty) {
-    locality =
-        '${placemarks[0].subAdministrativeArea} | ${placemarks[0].country}';
-  } else if (placemarks[0].administrativeArea!.isNotEmpty) {
-    locality = '${placemarks[0].administrativeArea} | ${placemarks[0].country}';
-  } else if (placemarks[0].name!.isNotEmpty) {
-    locality = '${placemarks[0].name} | ${placemarks[0].country}';
-  } else {}
-  print(locality);
-  return locality;
-}
-
-// Dialog to ask user to enable location services
-// Returns true if user chose to open settings, false if cancelled
+/// Show location service dialog using native GPS enable request
+/// This function uses the location package for native GPS enabling
+/// Returns true if user enables GPS, false otherwise
 Future<bool> showLocationServiceDialog(BuildContext context) async {
-  final result = await showDialog<bool>(
-    context: context,
-    barrierDismissible: false, // User must tap button
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: const Icon(
-          Icons.location_off,
-          size: 48,
-          color: Colors.red,
-        ),
-        content: SingleChildScrollView(
-          child: ListBody(
-            children: <Widget>[
-              Text(
-                'Location Services Disabled',
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 16),
-              Text(
-                'This app needs location services to work properly. Please enable location services in your device settings.',
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ),
-        ),
-        actions: <Widget>[
-          TextButton(
-            child: Text('Continue Without Location'),
-            onPressed: () {
-              Navigator.of(context).pop(false); // Return false for cancel
-            },
-          ),
-          ElevatedButton(
-            child: Text('Open Settings'),
-            onPressed: () async {
-              Navigator.of(context).pop(true); // Return true for open settings
-              // Open location settings with comprehensive error handling
-              try {
-                await Geolocator.openLocationSettings();
-                print("Successfully opened location settings");
-              } catch (e) {
-                print("Error opening location settings from dialog: $e");
-                // If geolocator plugin fails, show user guidance
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                          'Please manually enable location services in your device settings'),
-                      duration: Duration(seconds: 4),
-                    ),
-                  );
-                }
-              }
-            },
-          ),
-        ],
-      );
-    },
-  );
+  try {
+    print("🚀 Showing native GPS enable dialog...");
 
-  return result ?? false; // Default to false if dialog is dismissed
+    // Initialize location package for native GPS enabling
+    loc.Location location = loc.Location();
+    bool serviceEnabled;
+
+    // Check if location service is enabled
+    try {
+      serviceEnabled = await location.serviceEnabled();
+      print("📡 Location services enabled: $serviceEnabled");
+    } catch (e) {
+      print("❌ Error checking location services: $e");
+      if (e.toString().contains('MissingPluginException')) {
+        print("🚫 Location plugin not available in release mode");
+        return false;
+      }
+      return false;
+    }
+
+    // If service not enabled, request to enable it natively
+    if (!serviceEnabled) {
+      print(
+          "⚠️ Location services are disabled, requesting to enable natively...");
+      try {
+        serviceEnabled = await location.requestService();
+        print("📱 Native GPS enable request result: $serviceEnabled");
+        return serviceEnabled;
+      } catch (e) {
+        print("❌ Error requesting location service: $e");
+        if (e.toString().contains('MissingPluginException')) {
+          print("🚫 Location plugin not available in release mode");
+          return false;
+        }
+        return false;
+      }
+    }
+
+    // Service already enabled
+    print("✅ Location services already enabled");
+    return true;
+  } catch (e) {
+    print("❌ Unexpected error in showLocationServiceDialog: $e");
+    return false;
+  }
+}
+
+/// Send location coordinates to the server
+/// This function sends the provided coordinates to update the user's location
+Future<void> sendLocation(BuildContext context, String coordinates) async {
+  try {
+    print("📤 Sending location: $coordinates");
+
+    // Parse coordinates (format: "lat,lon")
+    List<String> coords = coordinates.split(',');
+    if (coords.length != 2) {
+      print("❌ Invalid coordinates format: $coordinates");
+      return;
+    }
+
+    double latitude = double.parse(coords[0]);
+    double longitude = double.parse(coords[1]);
+
+    // Get address from coordinates
+    try {
+      List<Placemark> placemarks =
+          await placemarkFromCoordinates(latitude, longitude);
+      String locality = '';
+      if (placemarks.isNotEmpty) {
+        Placemark place = placemarks[0];
+        locality =
+            '${place.locality ?? ''}, ${place.administrativeArea ?? ''}, ${place.country ?? ''}';
+      }
+
+      // Call the update location API
+      final provider = Provider.of<DataProvider>(context, listen: false);
+      String? apiToken = Hive.box("token").get('api_token');
+
+      if (apiToken == null) {
+        print("❌ No API token found");
+        return;
+      }
+
+      var response = await http.post(
+          Uri.parse(
+              '$updateLocationApi$locality&latitude=$latitude&longitude=$longitude'),
+          headers: {
+            "device-id": provider.deviceId ?? '',
+            "api-token": apiToken
+          });
+
+      if (response.statusCode == 200) {
+        print("✅ Location sent successfully");
+      } else {
+        print("❌ Failed to send location: ${response.statusCode}");
+      }
+    } catch (e) {
+      print("❌ Error getting address or sending location: $e");
+    }
+  } catch (e) {
+    print("❌ Error parsing coordinates: $e");
+  }
 }

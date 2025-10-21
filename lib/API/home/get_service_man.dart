@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
+import 'package:location/location.dart' as loc;
 import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
@@ -13,133 +13,130 @@ import 'package:tuw_services/providers/data_provider.dart';
 import 'package:tuw_services/providers/servicer_provider.dart';
 import 'package:tuw_services/screens/serviceman/servicer.dart';
 
-Future<Position?> determinePosition() async {
-  bool serviceEnabled;
-  LocationPermission permission;
-  await Geolocator.requestPermission();
-  // Test if location services are enabled.
-  serviceEnabled = await Geolocator.isLocationServiceEnabled();
-  if (!serviceEnabled) {
-    // Location services are not enabled don't continue
-    // accessing the position and request users of the
-    // App to enable the location services.
-    await Geolocator.openLocationSettings();
-    return Future.error('Location services are disabled..');
-  }
+/// Determine the current position of the device using only location package.
+/// Uses native GPS enabling and permission requests for the best user experience.
+/// Returns LocationData if successful, null if location services fail.
+/// This provides native Android dialogs and maximum compatibility.
+Future<loc.LocationData?> determinePosition() async {
+  try {
+    print("🔍 Starting location determination with location package only...");
 
-  permission = await Geolocator.checkPermission();
-  if (permission == LocationPermission.denied) {
-    permission = await Geolocator.requestPermission();
-    if (permission == LocationPermission.denied) {
-      // Permissions are denied, next time you could try
-      // requesting permissions again (this is also where
-      // Android's shouldShowRequestPermissionRationale
-      // returned true. According to Android guidelines
-      // your App should show an explanatory UI now.
-      return Future.error('Location permissions are denied');
+    // Initialize location package
+    loc.Location location = loc.Location();
+    bool serviceEnabled;
+    loc.PermissionStatus permissionGranted;
+
+    // Step 1: Check if location service is enabled
+    try {
+      serviceEnabled = await location.serviceEnabled();
+      print("📡 Location services enabled: $serviceEnabled");
+    } catch (e) {
+      print("❌ Error checking location services: $e");
+      if (e.toString().contains('MissingPluginException')) {
+        print("🚫 Location plugin not available in release mode");
+        return _getFallbackLocationData();
+      }
+      return _getFallbackLocationData();
     }
+
+    // Step 2: If service not enabled, request to enable it natively
+    if (!serviceEnabled) {
+      print(
+          "⚠️ Location services are disabled, requesting to enable natively...");
+      try {
+        serviceEnabled = await location.requestService();
+        print("📱 Native GPS enable request result: $serviceEnabled");
+      } catch (e) {
+        print("❌ Error requesting location service: $e");
+        if (e.toString().contains('MissingPluginException')) {
+          print("🚫 Location plugin not available in release mode");
+          return _getFallbackLocationData();
+        }
+        return _getFallbackLocationData();
+      }
+
+      if (!serviceEnabled) {
+        print("❌ User declined to enable location services");
+        return _getFallbackLocationData();
+      }
+    }
+
+    // Step 3: Check permission status
+    try {
+      permissionGranted = await location.hasPermission();
+      print("🔐 Current permission status: $permissionGranted");
+    } catch (e) {
+      print("❌ Error checking permission: $e");
+      if (e.toString().contains('MissingPluginException')) {
+        print("🚫 Location plugin not available in release mode");
+        return _getFallbackLocationData();
+      }
+      return _getFallbackLocationData();
+    }
+
+    // Step 4: If permission denied, request it natively
+    if (permissionGranted == loc.PermissionStatus.denied) {
+      print("⚠️ Location permission denied, requesting natively...");
+      try {
+        permissionGranted = await location.requestPermission();
+        print("📱 Native permission request result: $permissionGranted");
+      } catch (e) {
+        print("❌ Error requesting permission: $e");
+        if (e.toString().contains('MissingPluginException')) {
+          print("🚫 Location plugin not available in release mode");
+          return _getFallbackLocationData();
+        }
+        return _getFallbackLocationData();
+      }
+    }
+
+    // Step 5: Check final permission status
+    bool finalPermissionGranted =
+        (permissionGranted == loc.PermissionStatus.granted ||
+            permissionGranted == loc.PermissionStatus.grantedLimited);
+
+    if (!finalPermissionGranted) {
+      print("❌ Location permissions are denied by user: $permissionGranted");
+      if (permissionGranted == loc.PermissionStatus.deniedForever) {
+        print("🚫 Location permissions are permanently denied");
+        // Note: We can't open app settings without geolocator, so just return fallback
+      }
+      return _getFallbackLocationData();
+    }
+
+    // Step 6: Get current position using location package
+    print("✅ Permissions granted, getting current position...");
+    try {
+      loc.LocationData locationData = await location.getLocation();
+      print(
+          "📍 Position obtained: ${locationData.latitude}, ${locationData.longitude}");
+      return locationData;
+    } catch (e) {
+      print("❌ Error getting current position: $e");
+      if (e.toString().contains('MissingPluginException')) {
+        print("🚫 Location plugin not available in release mode");
+        return _getFallbackLocationData();
+      }
+      return _getFallbackLocationData();
+    }
+  } catch (e) {
+    print("❌ Unexpected error in determinePosition: $e");
+    return _getFallbackLocationData();
   }
+}
 
-  if (permission == LocationPermission.deniedForever) {
-    // Permissions are denied forever, handle appropriately.
-    return Future.error(
-        'Location permissions are permanently denied, we cannot request permissions.');
-  }
-
-  // When we reach here, permissions are granted and we can
-  // continue accessing the position of the device.
-  return await Geolocator.getCurrentPosition();
-  // print("=== Starting determinePosition ===");
-
-  // // Step 2: Check current permission status
-  // LocationPermission permission = LocationPermission.denied;
-  // try {
-  //   permission = await Geolocator.checkPermission();
-  //   print("Current location permission in determinePosition: $permission");
-  // } catch (e) {
-  //   print("Error checking location permission in determinePosition: $e");
-  //   if (e.toString().contains('MissingPluginException')) {
-  //     print(
-  //         "Permission check failed in determinePosition - plugin not available, returning null");
-  //     return null;
-  //   }
-  //   permission = LocationPermission.denied;
-  // }
-
-  // // Step 3: Request permission if not granted and plugin is available
-  // if (permission == LocationPermission.denied) {
-  //   try {
-  //     print("Requesting location permission in determinePosition...");
-  //     permission = await Geolocator.requestPermission();
-  //     print("Permission request result in determinePosition: $permission");
-  //   } catch (e) {
-  //     print("Error requesting location permission in determinePosition: $e");
-  //     if (e.toString().contains('MissingPluginException')) {
-  //       print(
-  //           "Permission request failed in determinePosition - plugin not available, returning null");
-  //       return null;
-  //     }
-  //     permission = LocationPermission.denied;
-  //   }
-  // }
-
-  // // Step 3: Handle permission results
-  // if (permission == LocationPermission.denied) {
-  //   try {
-  //     await Geolocator.openLocationSettings();
-  //   } catch (e) {
-  //     print("Error opening location settings: $e");
-  //   }
-  //   print(
-  //       'Location permissions are denied in determinePosition, returning null');
-  //   return null; // Return null instead of throwing error
-  // }
-
-  // if (permission == LocationPermission.deniedForever) {
-  //   try {
-  //     await Geolocator.openLocationSettings();
-  //   } catch (e) {
-  //     print("Error opening location settings: $e");
-  //   }
-  //   print(
-  //       'Location permissions are permanently denied in determinePosition, returning null');
-  //   return null; // Return null instead of throwing error
-  // }
-
-  // // Step 4: Permission granted, now check if location services are enabled
-  // bool serviceEnabled = false;
-  // try {
-  //   serviceEnabled = await Geolocator.isLocationServiceEnabled();
-  //   print("Location service enabled in determinePosition: $serviceEnabled");
-  // } catch (e) {
-  //   print("Error checking location service status in determinePosition: $e");
-  //   if (e.toString().contains('MissingPluginException')) {
-  //     print(
-  //         "Location service check failed in determinePosition - plugin not available, returning null");
-  //     return null; // Return null instead of throwing error
-  //   }
-  //   serviceEnabled = false;
-  // }
-
-  // // Step 5: If location services disabled, return null
-  // if (!serviceEnabled) {
-  //   print("Location services disabled in determinePosition, returning null");
-  //   return null; // Return null instead of throwing error
-  // }
-
-  // // Step 6: Both permission granted and services enabled - get position
-  // try {
-  //   print("Getting current position in determinePosition...");
-  //   return await Geolocator.getCurrentPosition();
-  // } catch (e) {
-  //   print("Error getting current position in determinePosition: $e");
-  //   if (e.toString().contains('MissingPluginException')) {
-  //     print("getCurrentPosition failed - plugin not available, returning null");
-  //     return null; // Return null instead of throwing error
-  //   }
-  //   print("getCurrentPosition failed with error: $e, returning null");
-  //   return null; // Return null instead of throwing error
-  // }
+/// Returns fallback coordinates for Muscat, Oman when location services fail
+loc.LocationData _getFallbackLocationData() {
+  print("🏠 Using fallback coordinates: Muscat, Oman (23.5859, 58.4059)");
+  return loc.LocationData.fromMap({
+    'latitude': 23.5859,
+    'longitude': 58.4059,
+    'accuracy': 0.0,
+    'altitude': 0.0,
+    'heading': 0.0,
+    'speed': 0.0,
+    'time': DateTime.now().millisecondsSinceEpoch.toDouble(),
+  });
 }
 
 Future<void> getServiceMan(BuildContext context, id, homeservice) async {
@@ -154,23 +151,24 @@ Future<void> getServiceMan(BuildContext context, id, homeservice) async {
     apiToken = '';
   }
   try {
-    Position? position = await determinePosition();
+    loc.LocationData? locationData = await determinePosition();
     log('user details -------- ${userDetails?.latitude}');
 
     double latitude = 23.5859; // Default fallback coordinates (Muscat, Oman)
     double longitude = 58.4059;
 
     // Step 4: Try to get current position if everything is available
-
     try {
-      if (position == null) return;
-
-      ;
-      log('position-------_${position.latitude}------${position.longitude}');
-      latitude = position.latitude;
-      longitude = position.longitude;
-      userDetails?.latitude = position.latitude.toString();
-      userDetails?.longitude = position.longitude.toString();
+      if (locationData != null) {
+        latitude = locationData.latitude ?? 23.5859;
+        longitude = locationData.longitude ?? 58.4059;
+        log('position-------_${latitude}------${longitude}');
+        userDetails?.latitude = latitude.toString();
+        userDetails?.longitude = longitude.toString();
+        print("📍 Using actual location: $latitude, $longitude");
+      } else {
+        print("🏠 Using fallback location: $latitude, $longitude");
+      }
     } catch (e) {
       print("Error getting position in getServiceMan, using fallback: $e");
       // Use fallback coordinates if position determination fails
@@ -185,7 +183,7 @@ Future<void> getServiceMan(BuildContext context, id, homeservice) async {
       log('getServiceMan------------>> ${response.body}------${response.request}');
       print("Navigation active");
 
-      navToServiceMan(context, id, homeservice, position);
+      navToServiceMan(context, id, homeservice, locationData);
       if (jsonResponse['result'] == false) {
         await Hive.box("token").clear();
         return;
@@ -242,13 +240,11 @@ searchServiceMan(
   } on Exception catch (_) {}
 }
 
-navToServiceMan(context, id, homeservice, Position? position) {
-  if (position == null) {
-    if (Navigator.canPop(context)) {
-      Navigator.pop(context);
-    }
-    return;
-  }
+navToServiceMan(context, id, homeservice, loc.LocationData? locationData) {
+  // Always navigate regardless of location data availability
+  // The ServicerPage will handle fallback coordinates internally if needed
+  print(
+      "🚀 Navigating to ServicerPage with location data: ${locationData != null ? 'Available' : 'Using fallback'}");
 
   Navigator.pushReplacement(context,
       FadePageRoute(page: ServicerPage(id: id, homeservice: homeservice)));

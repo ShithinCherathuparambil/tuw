@@ -7,7 +7,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:flutter/services.dart';
-import 'package:geolocator/geolocator.dart';
+
 import 'package:hive/hive.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:provider/provider.dart';
@@ -53,16 +53,10 @@ Future<void> initPlatformState(BuildContext context) async {
   // }
 
   // Request location permission early in the app lifecycle
-  print("Requesting location permission after splash screen...");
-  try {
-    await Geolocator.requestPermission();
-    // await determinePosition();
-    bool permissionGranted = await requestEarlyLocationPermission();
-    print("Location permission request completed. Granted: $permissionGranted");
-  } catch (e) {
-    print("Location permission request failed: $e");
-    // Continue with app flow even if location permission fails
-  }
+  print("🚀 Requesting location permission after splash screen...");
+  bool permissionGranted = await requestLocationPermissionFromSplash();
+  print(
+      "📱 Location permission request completed. Granted: $permissionGranted");
 
   if (apiToken == null) {
     log("API token is null");

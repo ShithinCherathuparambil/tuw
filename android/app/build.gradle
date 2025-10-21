@@ -89,8 +89,8 @@ buildTypes {
     release {
         shrinkResources true
         minifyEnabled true
-        signingConfig signingConfigs.release
         proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        signingConfig signingConfigs.release
     }
 }
 }
@@ -106,4 +106,7 @@ dependencies {
     // Force compatible androidx.core versions
     implementation 'androidx.core:core:1.13.1'
     implementation 'androidx.core:core-ktx:1.13.1'
+
+    // AppCompat for location package theme support
+    implementation 'androidx.appcompat:appcompat:1.7.0'
 }

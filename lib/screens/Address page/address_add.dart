@@ -544,8 +544,10 @@ class _UserAddressEditState extends State<UserAddressEdit> {
                                           Navigator.push(context,
                                               MaterialPageRoute(builder: (ctx) {
                                             return AddressLocatorScreen(
-                                              lat: s[0].toString(),
-                                              lot: s[1].toString(),
+                                              lat: (s.latitude ?? 23.5859)
+                                                  .toString(),
+                                              lot: (s.longitude ?? 58.4059)
+                                                  .toString(),
                                               imageFile: imageFile,
                                               defaultReg: defaultReg,
                                               defRegion: defRegion,

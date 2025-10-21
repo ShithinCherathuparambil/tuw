@@ -7,10 +7,10 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
- import 'package:google_nav_bar/google_nav_bar.dart';
+import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:hive/hive.dart';
 import 'package:image_picker/image_picker.dart';
- import 'package:provider/provider.dart';
+import 'package:provider/provider.dart';
 import 'package:tuw_services/API/address/getUserAddress.dart';
 import 'package:tuw_services/API/endpoint.dart';
 import 'package:tuw_services/API/viewProfile.dart';
@@ -29,7 +29,7 @@ import 'package:tuw_services/widgets/backbutton.dart';
 import 'package:tuw_services/widgets/custom_drawer.dart';
 import '../../l10n/app_localizations.dart';
 import 'package:tuw_services/widgets/top_logo.dart';
- import 'package:http/http.dart' as http;
+import 'package:http/http.dart' as http;
 import 'package:async/async.dart';
 
 class AddressPage extends StatefulWidget {
@@ -139,35 +139,42 @@ class _AddressPageState extends State<AddressPage> {
                   ),
                   GButton(
                     icon: FontAwesomeIcons.message,
-                    leading: Stack(
-                      children: [InkWell(
+                    leading: Stack(children: [
+                      InkWell(
                         child: SizedBox(
                             width: 24,
                             height: 24,
                             child: SvgPicture.asset(ImageAssets.chatIconSvg)),
-         
-             ),  Positioned(
-        right: 0,top: 0,
-        child: new Container(
-          padding: EdgeInsets.all(1),
-          decoration: new BoxDecoration(
-            color: Colors.red,
-            borderRadius: BorderRadius.circular(6),
-          ),
-          constraints: BoxConstraints(
-            minWidth: 15,
-            minHeight: 15,
-          ),
-          child: Text(provider.chatListDetails!.chatMessage!.data!.isNotEmpty? 
-              provider.chatListDetails!.chatMessage!.data![0].unreadCount.toString()
-             :'0',style: new TextStyle(
-              color: Colors.white,
-              fontSize: 11,
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ),
-      ) ]),
+                      ),
+                      Positioned(
+                        right: 0,
+                        top: 0,
+                        child: new Container(
+                          padding: EdgeInsets.all(1),
+                          decoration: new BoxDecoration(
+                            color: Colors.red,
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          constraints: BoxConstraints(
+                            minWidth: 15,
+                            minHeight: 15,
+                          ),
+                          child: Text(
+                            provider.chatListDetails!.chatMessage!.data!
+                                    .isNotEmpty
+                                ? provider.chatListDetails!.chatMessage!
+                                    .data![0].unreadCount
+                                    .toString()
+                                : '0',
+                            style: new TextStyle(
+                              color: Colors.white,
+                              fontSize: 11,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      )
+                    ]),
                   ),
                 ],
                 haptic: true,
@@ -512,8 +519,10 @@ class _AddressPageState extends State<AddressPage> {
                                         Navigator.push(context,
                                             MaterialPageRoute(builder: (ctx) {
                                           return UserAddressEdit(
-                                              lat: s[0].toString(),
-                                              lot: s[1].toString());
+                                              lat: (s.latitude ?? 23.5859)
+                                                  .toString(),
+                                              lot: (s.longitude ?? 58.4059)
+                                                  .toString());
                                         }));
                                       },
                                       child: Padding(
