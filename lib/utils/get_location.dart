@@ -629,19 +629,17 @@ Future<bool> showLocationServiceDialog(BuildContext context) async {
 
 /// Send location coordinates to the server
 /// This function sends the provided coordinates to update the user's location
-Future<void> sendLocation(BuildContext context, String coordinates) async {
+Future<void> sendLocation(
+    {required BuildContext context,
+    required String lat,
+    required String lon}) async {
   try {
-    print("📤 Sending location: $coordinates");
+    print("📤 Sending location: $lat, $lon");
 
     // Parse coordinates (format: "lat,lon")
-    List<String> coords = coordinates.split(',');
-    if (coords.length != 2) {
-      print("❌ Invalid coordinates format: $coordinates");
-      return;
-    }
 
-    double latitude = double.parse(coords[0]);
-    double longitude = double.parse(coords[1]);
+    double latitude = double.parse(lat);
+    double longitude = double.parse(lon);
 
     // Get address from coordinates
     try {

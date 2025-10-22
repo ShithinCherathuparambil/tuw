@@ -55,9 +55,12 @@ class _GoogleMapScreenState extends State<GoogleMapScreen> {
                         isLoading = true;
                       });
                       await updateLocationFunction(
-                          context,
-                          [_lastTap?.latitude, _lastTap?.longitude],
-                          locality ?? '');
+                          context: context,
+                          latitude:
+                              (_lastTap?.latitude ?? 0.00000000).toString(),
+                          longiutude:
+                              (_lastTap?.longitude ?? 0.00000000).toString(),
+                          locality: locality ?? '');
                       await viewProfile(context);
                       setState(() {
                         isLoading = false;

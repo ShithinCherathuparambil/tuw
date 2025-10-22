@@ -7,10 +7,10 @@ import 'package:tuw_services/providers/data_provider.dart';
 import 'package:tuw_services/screens/serviceman/servicer.dart';
 
 updateLocationFunction(
-  BuildContext context,
-  List latLon,
-  String locality,
-) async {
+    {required BuildContext context,
+    required String latitude,
+    required String longiutude,
+    required String locality}) async {
   final provider = Provider.of<DataProvider>(context, listen: false);
   provider.subServicesModel = null;
   final apiToken = Hive.box("token").get('api_token');
@@ -18,7 +18,7 @@ updateLocationFunction(
   try {
     var response = await http.post(
         Uri.parse(
-            '$updateLocationApi$locality&latitude=${latLon[0]}&longitude=${latLon[1]}'),
+            '$updateLocationApi$locality&latitude=$latitude&longitude=$longiutude'),
         headers: {"device-id": provider.deviceId ?? '', "api-token": apiToken});
     if (response.statusCode == 200) {
       // var jsonResponse = jsonDecode(response.body);
@@ -37,7 +37,7 @@ updateLocationFunction(
       // print('Something went wrong');
     }
   } on Exception catch (e) {
-     print(e);
+    print(e);
   }
 }
 

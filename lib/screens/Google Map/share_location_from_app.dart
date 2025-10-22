@@ -34,7 +34,7 @@ class _SelectLocationFromAppState extends State<SelectLocationFromApp> {
 
   @override
   void initState() {
-     super.initState();
+    super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
       // final servicerProvider =
@@ -77,13 +77,14 @@ class _SelectLocationFromAppState extends State<SelectLocationFromApp> {
                       setState(() {
                         isLoading = true;
                       });
-                      final lat = _lastTap!.latitude.toString();
-                      final lon = _lastTap!.longitude.toString();
-                      await sendLocation(context, "$lat,$lon");
-
-                      setState(() {
-                        isLoading = false;
-                      });
+                      String? lat = _lastTap?.latitude.toString();
+                      String? lon = _lastTap?.longitude.toString();
+                      await sendLocation(
+                          context: context,
+                          lat: lat ?? '0.00000000',
+                          lon: lon ?? '0.00000000');
+                      isLoading = false;
+                      setState(() {});
                       Navigator.pop(context);
                     },
                     child: isLoading

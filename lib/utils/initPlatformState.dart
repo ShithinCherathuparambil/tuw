@@ -17,12 +17,10 @@ import 'package:tuw_services/API/get_countries.dart';
 import 'package:tuw_services/API/get_serviceManProfileDetails.dart';
 import 'package:tuw_services/API/get_language.dart';
 import 'package:tuw_services/API/home/get_home.dart';
-import 'package:tuw_services/API/home/get_service_man.dart';
 import 'package:tuw_services/components/routes_manager.dart';
 import 'package:tuw_services/providers/data_provider.dart';
 import 'package:tuw_services/API/viewProfile.dart';
 import 'package:tuw_services/utils/getLocalLanguage.dart';
-import 'package:tuw_services/utils/get_location.dart';
 
 Future<void> initPlatformState(BuildContext context) async {
   final provider = Provider.of<DataProvider>(context, listen: false);
@@ -54,9 +52,9 @@ Future<void> initPlatformState(BuildContext context) async {
 
   // Request location permission early in the app lifecycle
   print("🚀 Requesting location permission after splash screen...");
-  bool permissionGranted = await requestLocationPermissionFromSplash();
-  print(
-      "📱 Location permission request completed. Granted: $permissionGranted");
+  // bool permissionGranted = await requestLocationPermissionFromSplash();
+  // print(
+  //     "📱 Location permission request completed. Granted: $permissionGranted");
 
   if (apiToken == null) {
     log("API token is null");
