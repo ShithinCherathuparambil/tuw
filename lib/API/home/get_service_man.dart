@@ -13,7 +13,6 @@ import 'package:tuw_services/model/serviceManLIst.dart';
 import 'package:tuw_services/providers/data_provider.dart';
 import 'package:tuw_services/providers/servicer_provider.dart';
 import 'package:tuw_services/screens/serviceman/servicer.dart';
-import 'package:tuw_services/utils/get_location.dart';
 
 /// Determine the current position of the device using only location package.
 /// Uses native GPS enabling and permission requests for the best user experience.
