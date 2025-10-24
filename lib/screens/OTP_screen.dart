@@ -382,7 +382,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:hive/hive.dart';
 import 'package:pinput/pinput.dart';
 import 'package:provider/provider.dart';
-import 'package:sms_autofill/sms_autofill.dart';
+// import 'package:sms_autofill/sms_autofill.dart';  // Removed for Google Play Protect compliance
+import 'package:tuw_services/utils/sms_retriever.dart' as sms;
 import 'package:tuw_services/API/address/getUserAddress.dart';
 import 'package:tuw_services/API/endpoint.dart';
 import 'package:tuw_services/API/get_chat_list.dart';
@@ -414,7 +415,7 @@ class OTPscreen extends StatefulWidget {
   State<OTPscreen> createState() => _OTPscreenState();
 }
 
-class _OTPscreenState extends State<OTPscreen> with CodeAutoFill {
+class _OTPscreenState extends State<OTPscreen> {
   bool isResendButtonClicked = false;
   bool loading = false;
   String lang = '';
@@ -428,16 +429,15 @@ class _OTPscreenState extends State<OTPscreen> with CodeAutoFill {
     lang = Hive.box('LocalLan').get('lang');
     print("FCMT : $fcmToken");
 
-    listenForCode();
-    // _initSmsAutoFill();
+    _initSmsRetriever();
 
-    // Get app signature for SMS autofill with error handling
+    // Get app signature for SMS Retriever API (Google Play Protect compliant)
     try {
-      SmsAutoFill().getAppSignature.then((signature) {
+      sms.SmsRetriever.getAppSignature().then((signature) {
         setState(() {
-          appSignature = signature;
+          appSignature = signature ?? "";
         });
-        debugPrint("App Signature for SMS: $signature");
+        debugPrint("App Signature for SMS Retriever: $signature");
       }).catchError((error) {
         debugPrint("Error getting app signature in OTP: $error");
         setState(() {
@@ -455,19 +455,34 @@ class _OTPscreenState extends State<OTPscreen> with CodeAutoFill {
   @override
   void dispose() {
     super.dispose();
-    cancel();
+    _stopSmsRetriever();
   }
 
-  @override
-  void codeUpdated() {
-    debugPrint("OTP Code received: $code");
-    setState(() {
-      otpCode = code;
-      if (otpCode != null) {
-        PhoneNumberControllers.otpCon.text = otpCode ?? '';
-        debugPrint("OTP Auto-filled successfully");
+  // Initialize SMS Retriever API
+  void _initSmsRetriever() {
+    sms.SmsRetriever.startSmsRetriever().then((success) {
+      if (success) {
+        debugPrint("SMS Retriever started successfully");
+        // Listen for SMS messages
+        sms.SmsRetriever.smsStream.listen((smsMessage) {
+          debugPrint("SMS received: $smsMessage");
+          final otpCode = sms.SmsRetriever.extractOtpFromSms(smsMessage);
+          if (otpCode != null) {
+            setState(() {
+              PhoneNumberControllers.otpCon.text = otpCode;
+              debugPrint("OTP Auto-filled: $otpCode");
+            });
+          }
+        });
+      } else {
+        debugPrint("Failed to start SMS Retriever");
       }
     });
+  }
+
+  // Stop SMS Retriever API
+  void _stopSmsRetriever() {
+    sms.SmsRetriever.stopSmsRetriever();
   }
 
   @override

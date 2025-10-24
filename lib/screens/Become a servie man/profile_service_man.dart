@@ -1249,9 +1249,7 @@ class _ProfileServicePageState extends State<ProfileServicePage> {
                                                         fontSize: 16))),
                                           ],
                                         ),
-                                        const SizedBox(
-                                          height: 10,
-                                        )
+                                        const SizedBox(height: 10)
                                       ],
                                     ),
                                   ),
@@ -1292,7 +1290,7 @@ class _ProfileServicePageState extends State<ProfileServicePage> {
     }
   }
 
-  onContinue() {
+  Future<void> onContinue() async {
     final provider = Provider.of<DataProvider>(context, listen: false);
     final homeData = provider.homeModel?.services;
     final str = AppLocalizations.of(context)!;
@@ -1317,16 +1315,13 @@ class _ProfileServicePageState extends State<ProfileServicePage> {
     //   showAnimatedSnackBar(context, "Please Enter Your Address");
     // }
     else {
+      await getCustomerParent(context);
       widget.isservicepage == true
           ? Navigator.push(context, MaterialPageRoute(builder: (ctx) {
-              return ChooseMoreServicePage(
-                services: homeData?[widget.index],
-              );
+              return ChooseMoreServicePage(services: homeData?[widget.index]);
             }))
           : Navigator.push(context, MaterialPageRoute(builder: (ctx) {
-              return ChooseServicePage(
-                scaffoldKey: _scaffoldKey,
-              );
+              return ChooseServicePage(scaffoldKey: _scaffoldKey);
             }));
     }
   }

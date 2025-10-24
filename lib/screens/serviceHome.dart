@@ -321,7 +321,7 @@ class _ServiceHomePageState extends State<ServiceHomePage> {
                                     FadePageRoute(page: LoadingListPage()));
                                 final id = homeData[index].id;
                                 servicerProvider.serviceId = id;
-                                getSubService(
+                                await getSubService(
                                     context, id, false, homeData[index]);
                               },
                               child: Container(

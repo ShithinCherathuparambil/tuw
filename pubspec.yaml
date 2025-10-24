@@ -15,7 +15,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 1.7.0+14
+version: 1.7.1+15
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
@@ -77,7 +77,7 @@ dependencies:
   latlong2: ^0.8.1
   internet_connection_checker: ^1.0.0+1
   multi_state_button: ^1.1.3
-  flutter_phone_direct_caller: ^2.1.1
+  # flutter_phone_direct_caller: ^2.1.1  # Removed for Google Play Protect compliance - using url_launcher instead
   record: ^6.1.1
   url_launcher: ^6.1.11
   audioplayers: ^6.5.0
@@ -99,7 +99,8 @@ dependencies:
   flutter_local_notifications: ^18.0.1
   device_info_plus: ^12.1.0
   shared_preferences: ^2.2.2
-  sms_autofill: ^2.4.1
+  # sms_autofill: ^2.4.1  # Replaced with SMS Retriever API for Google Play Protect compliance
+  google_sign_in: ^6.2.1  # For SMS Retriever API
   dio: ^5.7.0
   location: ^8.0.1
   # flutter_ffmpeg:

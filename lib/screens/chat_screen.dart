@@ -10,7 +10,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
-import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
+// import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';  // Removed for Google Play Protect compliance
+import 'package:url_launcher/url_launcher.dart';
 import 'package:hive/hive.dart';
 import 'package:http/http.dart';
 import 'package:image_picker/image_picker.dart';
@@ -1647,9 +1648,15 @@ class _ChatScreenState extends State<ChatScreen> {
         Padding(
           padding: EdgeInsets.only(right: 25.0),
           child: InkWell(
-            onTap: () {
-              FlutterPhoneDirectCaller.callNumber(
-                  _provider.serviceManDetails?.userData?.phone ?? '');
+            onTap: () async {
+              final phoneNumber =
+                  _provider.serviceManDetails?.userData?.phone ?? '';
+              final Uri phoneUri = Uri(scheme: 'tel', path: phoneNumber);
+              if (await canLaunchUrl(phoneUri)) {
+                await launchUrl(phoneUri);
+              } else {
+                print('Could not launch phone dialer for $phoneNumber');
+              }
             },
             child: const Icon(Icons.call_outlined, size: 25),
           ),

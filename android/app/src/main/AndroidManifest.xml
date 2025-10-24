@@ -4,27 +4,37 @@
     <!-- Minimum screen size support -->
     <supports-screens android:requiresSmallestWidthDp="320" />
 
-    <!-- Permissions -->
+    <!-- Essential Permissions for Service App -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <!-- Location permissions for service provider tracking -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
+
+    <!-- Media permissions for service documentation -->
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
-    <uses-permission android:name="android.permission.CALL_PHONE" />
+
+    <!-- Communication permissions for service coordination -->
+    <!-- <uses-permission android:name="android.permission.CALL_PHONE" /> --> <!-- Removed - using intent-based calling instead -->
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <!-- SMS permissions removed - using SMS Retriever API instead for Google Play Protect compliance -->
+    <!-- <uses-permission android:name="android.permission.RECEIVE_SMS" /> -->
+    <!-- <uses-permission android:name="android.permission.READ_SMS" /> -->
+
+    <!-- System permissions -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <uses-permission android:name="android.permission.RECEIVE_SMS" />
-    <uses-permission android:name="android.permission.READ_SMS" />
     <uses-permission android:name="com.google.android.gms.permission.AD_ID" />
 
     <application
@@ -32,7 +42,8 @@
     android:label="Tuw Services"
     android:icon="@mipmap/ic_launcher"
         android:allowBackup="true"
-        android:usesCleartextTraffic="true">
+        android:usesCleartextTraffic="false"
+        android:networkSecurityConfig="@xml/network_security_config">
 
         <!-- Main Activity -->
         <activity
@@ -69,9 +80,9 @@
         <!-- Google Maps API -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyATbPpXTjnk535Ntl9H-2CuVk_An46zPQ0" />
+            android:value="${MAPS_API_KEY}" />
 
-        <!-- SMS Retriever API receiver -->
+        <!-- SMS Retriever API receiver - Google Play Protect compliant -->
         <receiver
             android:name="com.google.android.gms.auth.api.phone.SmsRetrieverReceiver"
             android:exported="false"

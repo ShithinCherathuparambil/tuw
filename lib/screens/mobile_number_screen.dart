@@ -7,7 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:hive/hive.dart';
 import 'package:provider/provider.dart';
-import 'package:sms_autofill/sms_autofill.dart';
+// import 'package:sms_autofill/sms_autofill.dart';  // Removed for Google Play Protect compliance
+import 'package:tuw_services/utils/sms_retriever.dart';
 import 'package:tuw_services/API/endpoint.dart';
 import 'package:tuw_services/API/get_otp.dart';
 import 'package:tuw_services/animations/animtions.dart';
@@ -47,10 +48,10 @@ class _PhoneNumberScreenState extends State<PhoneNumberScreen> {
     PhoneNumberControllers.phoneNumCon.text = '';
     countryCode = "968";
     lang = Hive.box('LocalLan').get('lang');
-    // Get app signature for SMS autofill with error handling
+    // Get app signature for SMS Retriever API (Google Play Protect compliant)
     try {
-      SmsAutoFill().getAppSignature.then((signature) {
-        appSignature = signature;
+      SmsRetriever.getAppSignature().then((signature) {
+        appSignature = signature ?? "";
         print("App signature obtained: $signature");
       }).catchError((error) {
         print("Error getting app signature: $error");
@@ -72,9 +73,9 @@ class _PhoneNumberScreenState extends State<PhoneNumberScreen> {
   @override
   void dispose() {
     try {
-      SmsAutoFill().unregisterListener();
+      SmsRetriever.stopSmsRetriever();
     } catch (e) {
-      print("Error unregistering SMS listener: $e");
+      print("Error stopping SMS retriever: $e");
     }
     super.dispose();
   }
@@ -205,9 +206,7 @@ class _PhoneNumberScreenState extends State<PhoneNumberScreen> {
                                   width: .6,
                                   color: ColorManager.grayLight,
                                 ),
-                                const SizedBox(
-                                  width: 12,
-                                ),
+                                const SizedBox(width: 12),
                                 Expanded(
                                     child: SizedBox(
                                   child: TextField(
@@ -505,9 +504,9 @@ class _PhoneNumberScreenState extends State<PhoneNumberScreen> {
       setState(() {
         loading = true;
       });
-      // Get app signature and start listening for SMS with error handling
+      // Get app signature and start SMS Retriever API (Google Play Protect compliant)
       try {
-        appSignature = await SmsAutoFill().getAppSignature;
+        appSignature = await SmsRetriever.getAppSignature() ?? "";
         print("App signature for OTP: $appSignature");
       } catch (e) {
         print("Error getting app signature for OTP: $e");
@@ -515,10 +514,10 @@ class _PhoneNumberScreenState extends State<PhoneNumberScreen> {
       }
 
       try {
-        await SmsAutoFill().listenForCode();
-        print("Started listening for SMS code");
+        await SmsRetriever.startSmsRetriever();
+        print("Started SMS Retriever API");
       } catch (e) {
-        print("Error starting SMS listener: $e");
+        print("Error starting SMS Retriever: $e");
       }
       try {
         print("Starting OTP request...");

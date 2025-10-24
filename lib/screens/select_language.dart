@@ -10,7 +10,8 @@ import 'package:tuw_services/API/home/get_subService.dart';
 import 'package:tuw_services/API/viewProfile.dart';
 import 'package:tuw_services/components/color_manager.dart';
 import 'package:tuw_services/components/styles_manager.dart';
-import 'package:tuw_services/model/active_services.dart';
+
+import 'package:tuw_services/model/get_home.dart' as home;
 
 import 'package:tuw_services/providers/data_provider.dart';
 import 'package:tuw_services/providers/servicer_provider.dart';
@@ -138,7 +139,8 @@ class _SelectLanguageScreenState extends State<SelectLanguageScreen> {
                               print(selected);
                               // Validate and set the language code
                               String shortcode = lan?.shortcode ?? 'en';
-                              if (shortcode.isEmpty || !['en', 'hi', 'ar'].contains(shortcode)) {
+                              if (shortcode.isEmpty ||
+                                  !['en', 'hi', 'ar'].contains(shortcode)) {
                                 shortcode = 'en';
                               }
                               await Hive.box("LocalLan").put('lang', shortcode);
@@ -152,8 +154,11 @@ class _SelectLanguageScreenState extends State<SelectLanguageScreen> {
 
                               getlocalLanguage(context);
                               print(servicerProvider.serviceId);
-                              await getSubService(context,
-                                  servicerProvider.serviceId, true, Services());
+                              await getSubService(
+                                  context,
+                                  servicerProvider.serviceId,
+                                  true,
+                                  home.Services());
                               await getCustomerParent(context);
                               await getServiceManDetailsFun(
                                   context, servicerProvider.navServiceId);

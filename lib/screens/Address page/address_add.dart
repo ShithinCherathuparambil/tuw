@@ -529,8 +529,7 @@ class _UserAddressEditState extends State<UserAddressEdit> {
                                             isLocFetching = true;
                                           });
                                           final s =
-                                              await getCurrentLocationPermission(
-                                                  context);
+                                              await getCurrentLocationPermission();
                                           print(s);
                                           // Navigator.push(context,
                                           //     MaterialPageRoute(builder: (ctx) {

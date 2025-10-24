@@ -553,8 +553,7 @@ Future<loc.LocationData?> sendCurrentLocation(BuildContext context) async {
 }
 
 /// Backward compatibility wrapper for getCurrentLocationPermission that accepts context
-Future<loc.LocationData> getCurrentLocationPermission(
-    BuildContext context) async {
+Future<loc.LocationData> getCurrentLocationPermission() async {
   return await _getCurrentLocationPermissionCore();
 }
 

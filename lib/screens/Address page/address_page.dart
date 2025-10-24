@@ -497,8 +497,7 @@ class _AddressPageState extends State<AddressPage> {
                                           isLocFetching = true;
                                         });
                                         final s =
-                                            await getCurrentLocationPermission(
-                                                context);
+                                            await getCurrentLocationPermission();
                                         print(s);
                                         log("__________");
                                         // Navigator.push(context,

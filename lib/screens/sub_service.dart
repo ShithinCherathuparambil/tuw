@@ -16,7 +16,7 @@ import '../l10n/app_localizations.dart';
 import 'package:tuw_services/responsive/responsive_width.dart';
 import 'package:tuw_services/screens/home_page.dart';
 import 'package:tuw_services/loading%20screens/loading_page.dart';
-import 'package:tuw_services/utils/get_location.dart';
+
 import 'package:tuw_services/widgets/backbutton.dart';
 import 'package:tuw_services/widgets/custom_drawer.dart';
 import '../model/chat_list.dart';
@@ -234,7 +234,7 @@ class _SubServicesPageState extends State<SubServicesPage> {
                             return const LoadingListPage();
                           }));
                           final id = homeData?[index].id;
-                          await requestExplorerLocationPermission(context);
+                          // Location will be requested inside getSubService to avoid duplicate requests
                           getSubService(context, id, false, widget.homeService);
 
                           // Navigator.push(context,

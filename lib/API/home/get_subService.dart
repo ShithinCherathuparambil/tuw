@@ -11,12 +11,14 @@ import 'package:provider/provider.dart';
 import 'package:tuw_services/API/endpoint.dart';
 import 'package:tuw_services/API/home/get_service_man.dart';
 import 'package:tuw_services/components/routes_manager.dart';
+import 'package:tuw_services/model/get_home.dart';
 import 'package:tuw_services/model/sub_services_model.dart';
 import 'package:tuw_services/providers/data_provider.dart';
 import 'package:tuw_services/screens/sub_service.dart';
 import 'package:tuw_services/utils/get_location.dart';
 
-getSubService(BuildContext context, id, bool changeLan, homeService) async {
+getSubService(
+    BuildContext context, int? id, bool changeLan, Services homeService) async {
   final provider = Provider.of<DataProvider>(context, listen: false);
   // provider.subServicesModel = null;
   String? apiToken = Hive.box("token").get('api_token');
@@ -32,16 +34,15 @@ getSubService(BuildContext context, id, bool changeLan, homeService) async {
         headers: {"device-id": provider.deviceId ?? '', "api-token": apiToken});
     log(response.request.toString());
     if (response.statusCode == 200) {
-      var jsonResponse = jsonDecode(response.body);
+      final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
       log(response.body);
       if (jsonResponse['result'] == false) {
         await Hive.box("token").clear();
-
         return;
       }
       print(jsonResponse['type']);
       if (changeLan != true) {
-        selectServiceType(context, id, jsonResponse, homeService);
+        selectServiceType(context, id ?? 0, jsonResponse, homeService);
       }
     } else {
       // print('Something went wrong');
@@ -49,7 +50,8 @@ getSubService(BuildContext context, id, bool changeLan, homeService) async {
   } on Exception catch (_) {}
 }
 
-selectServiceType(context, id, jsonResponse, homeService) async {
+selectServiceType(BuildContext context, int id,
+    Map<String, dynamic> jsonResponse, Services homeService) async {
   log('selectServiceType');
   final provider = Provider.of<DataProvider>(context, listen: false);
   if (jsonResponse['type'] == 'service') {
@@ -91,7 +93,10 @@ selectServiceType(context, id, jsonResponse, homeService) async {
   // );
   // }
   else {
-    await getServiceMan(context, id, homeService);
+    // Get location once and pass it to getServiceMan to avoid duplicate requests
+    print("🔍 Getting location for service man API...");
+    // final locationData = await getCurrentLocationPermission();
+    await getServiceMan(context, id, homeService, providedLocation: null);
     // log('message--2');
 
     // // Step 1: Check current permission status first

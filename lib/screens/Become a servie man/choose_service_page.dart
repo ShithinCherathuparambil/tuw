@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:animated_snack_bar/animated_snack_bar.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
@@ -46,7 +48,7 @@ class _ChooseServicePageState extends State<ChooseServicePage> {
   int _selectedIndex = 2;
   final List<Widget> _screens = [const ServiceHomePage(), const MessagePage()];
   String lang = '';
-  List<Services> sGroup = [];
+  // List<Services> sGroup = [];
   List<Childservices> childGroup = [];
   late DataProvider _provider;
 
@@ -62,9 +64,12 @@ class _ChooseServicePageState extends State<ChooseServicePage> {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       final provider = Provider.of<DataProvider>(context, listen: false);
       List<Services> services = provider.customerParentSer?.services ?? [];
-      for (Services item in services) {
-        sGroup.add(item);
-      }
+      log('services ----- ${services.map((e) => e.service).toList()}');
+      // services.map((e) {
+      //   sGroup.add(e);
+      //   sGroup.toSet().toList();
+      // });
+      // log('services -----2 ${sGroup.map((e) => e.service).toList()}');
       provider.clearDocs();
       setState(() {});
       // print(sGroup[0]);
@@ -111,9 +116,7 @@ class _ChooseServicePageState extends State<ChooseServicePage> {
           SizedBox(
             height: 44,
             child: GNav(
-              tabMargin: const EdgeInsets.symmetric(
-                vertical: 0,
-              ),
+              tabMargin: const EdgeInsets.symmetric(vertical: 0),
               gap: 0,
               backgroundColor: ColorManager.whiteColor,
               mainAxisAlignment: MainAxisAlignment.center,
@@ -258,68 +261,77 @@ class _ChooseServicePageState extends State<ChooseServicePage> {
                                   padding:
                                       const EdgeInsets.fromLTRB(0, 10, 0, 10),
                                   child: DropdownButtonHideUnderline(
-                                    child: DropdownButton2(
-                                      iconStyleData: const IconStyleData(
-                                        icon: Icon(
-                                          Icons.keyboard_arrow_down,
-                                          size: 35,
-                                          color: ColorManager.black,
+                                    child: Consumer<DataProvider>(
+                                        builder: (context, provider, _) {
+                                      final List<Services> data = provider
+                                              .customerParentSer?.services ??
+                                          [];
+                                      return DropdownButton2(
+                                        iconStyleData: const IconStyleData(
+                                          icon: Icon(
+                                            Icons.keyboard_arrow_down,
+                                            size: 35,
+                                            color: ColorManager.black,
+                                          ),
                                         ),
-                                      ),
-                                      hint: Text(str.c_service_group_h,
-                                          style: getRegularStyle(
-                                              color: const Color.fromARGB(
-                                                  255, 173, 173, 173),
-                                              fontSize: 15)),
-                                      items: sGroup
-                                          .map((item) =>
-                                              DropdownMenuItem<Services>(
-                                                value: item,
-                                                child: Text(item.service ?? '',
-                                                    style: getRegularStyle(
-                                                        color:
-                                                            ColorManager.black,
-                                                        fontSize: 15)),
-                                              ))
-                                          .toList(),
-                                      // value: selectedValue,
-                                      customButton: selectedValue == null
-                                          ? null
-                                          : Padding(
-                                              padding:
-                                                  const EdgeInsets.fromLTRB(
-                                                      10, 10, 10, 10),
-                                              child: Text(
-                                                  selectedValue?.service ?? ''),
-                                            ),
-                                      onChanged: (value) async {
-                                        // provider.serviceId =
+                                        hint: Text(str.c_service_group_h,
+                                            style: getRegularStyle(
+                                                color: const Color.fromARGB(
+                                                    255, 173, 173, 173),
+                                                fontSize: 15)),
+                                        items: data
+                                            .map((item) =>
+                                                DropdownMenuItem<Services>(
+                                                  value: item,
+                                                  child: Text(
+                                                      item.service ?? '',
+                                                      style: getRegularStyle(
+                                                          color: ColorManager
+                                                              .black,
+                                                          fontSize: 15)),
+                                                ))
+                                            .toList(),
+                                        // value: selectedValue,
+                                        customButton: selectedValue == null
+                                            ? null
+                                            : Padding(
+                                                padding:
+                                                    const EdgeInsets.fromLTRB(
+                                                        10, 10, 10, 10),
+                                                child: Text(
+                                                    selectedValue?.service ??
+                                                        ''),
+                                              ),
+                                        onChanged: (value) async {
+                                          // provider.serviceId =
 
-                                        setState(() {
-                                          selectedValue = value as Services;
-                                          childGroup.clear();
-                                          childSelectedValue = null;
-                                        });
-                                        provider.serviceId = selectedValue?.id;
-                                        print(provider.serviceId);
-                                        await getChildData();
-                                        setState(() {
-                                          isChild = provider.customerChildSer!
-                                              .childservices!.isNotEmpty;
-                                        });
-                                      },
-                                      buttonStyleData: ButtonStyleData(
-                                        height: 40,
-                                        padding: const EdgeInsets.fromLTRB(
-                                            12, 0, 8, 0),
-                                      ),
-                                      menuItemStyleData:
-                                          const MenuItemStyleData(
-                                        height: 40,
-                                        padding:
-                                            EdgeInsets.fromLTRB(12, 0, 12, 0),
-                                      ),
-                                    ),
+                                          setState(() {
+                                            selectedValue = value as Services;
+                                            childGroup.clear();
+                                            childSelectedValue = null;
+                                          });
+                                          provider.serviceId =
+                                              selectedValue?.id;
+                                          print(provider.serviceId);
+                                          await getChildData();
+                                          setState(() {
+                                            isChild = provider.customerChildSer!
+                                                .childservices!.isNotEmpty;
+                                          });
+                                        },
+                                        buttonStyleData: ButtonStyleData(
+                                          height: 40,
+                                          padding: const EdgeInsets.fromLTRB(
+                                              12, 0, 8, 0),
+                                        ),
+                                        menuItemStyleData:
+                                            const MenuItemStyleData(
+                                          height: 40,
+                                          padding:
+                                              EdgeInsets.fromLTRB(12, 0, 12, 0),
+                                        ),
+                                      );
+                                    }),
                                   ),
                                 ),
                               ),

@@ -8,10 +8,12 @@ import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:tuw_services/API/endpoint.dart';
 import 'package:tuw_services/components/routes_manager.dart';
+import 'package:tuw_services/model/get_home.dart';
 import 'package:tuw_services/model/serviceManLIst.dart';
 import 'package:tuw_services/providers/data_provider.dart';
 import 'package:tuw_services/providers/servicer_provider.dart';
 import 'package:tuw_services/screens/serviceman/servicer.dart';
+import 'package:tuw_services/utils/get_location.dart';
 
 /// Determine the current position of the device using only location package.
 /// Uses native GPS enabling and permission requests for the best user experience.
@@ -19,149 +21,173 @@ import 'package:tuw_services/screens/serviceman/servicer.dart';
 /// This provides native Android dialogs and maximum compatibility.
 Future<loc.LocationData?> determinePosition() async {
   try {
-    print("🔍 Starting location determination with location package only...");
+    print(
+        "🔍 Starting ENHANCED location determination with multiple methods...");
+    print("🔧 DEBUG: determinePosition() called");
 
-    // Initialize location package
+    print("🔧 DEBUG: Method 2 - Trying Location package...");
+    try {
+      final locationResult = await _tryLocationPackage();
+      if (locationResult != null) {
+        print("✅ SUCCESS: Location package provided real location!");
+        return locationResult;
+      }
+    } catch (e) {
+      print("⚠️ Location package failed: $e");
+    }
+
+    // Method 3: Use fallback coordinates
+    print("🔧 DEBUG: Method 3 - Using fallback coordinates...");
+    return null;
+  } catch (e) {
+    print("❌ Unexpected error in determinePosition: $e");
+    return null;
+  }
+}
+
+/// Try to get location using Location package (fallback)
+Future<loc.LocationData?> _tryLocationPackage() async {
+  try {
+    print("🔧 DEBUG: Initializing Location package...");
     loc.Location location = loc.Location();
     bool serviceEnabled;
     loc.PermissionStatus permissionGranted;
 
-    // Step 1: Check if location service is enabled
+    // Check if location service is enabled
     try {
       serviceEnabled = await location.serviceEnabled();
-      print("📡 Location services enabled: $serviceEnabled");
+      print("📡 Location package: Location services enabled: $serviceEnabled");
     } catch (e) {
-      print("❌ Error checking location services: $e");
-      if (e.toString().contains('MissingPluginException')) {
-        print("🚫 Location plugin not available in release mode");
-        return _getFallbackLocationData();
-      }
-      return _getFallbackLocationData();
+      print("❌ Location package: Error checking location services: $e");
+      return null;
     }
 
-    // Step 2: If service not enabled, request to enable it natively
+    // Request service if not enabled
     if (!serviceEnabled) {
-      print(
-          "⚠️ Location services are disabled, requesting to enable natively...");
+      print("⚠️ Location package: Requesting to enable location services...");
       try {
         serviceEnabled = await location.requestService();
-        print("📱 Native GPS enable request result: $serviceEnabled");
-      } catch (e) {
-        print("❌ Error requesting location service: $e");
-        if (e.toString().contains('MissingPluginException')) {
-          print("🚫 Location plugin not available in release mode");
-          return _getFallbackLocationData();
+        print(
+            "🔧 DEBUG: Location package service request result: $serviceEnabled");
+        if (!serviceEnabled) {
+          print(
+              "❌ Location package: User declined to enable location services");
+          return null;
         }
-        return _getFallbackLocationData();
-      }
 
-      if (!serviceEnabled) {
-        print("❌ User declined to enable location services");
-        return _getFallbackLocationData();
+        // Wait for GPS to initialize after being enabled
+        print("⏰ Waiting 3 seconds for GPS to initialize after enabling...");
+        await Future.delayed(const Duration(seconds: 3));
+      } catch (e) {
+        print("❌ Location package: Error requesting location service: $e");
+        return null;
       }
     }
 
-    // Step 3: Check permission status
+    // Check permissions
     try {
       permissionGranted = await location.hasPermission();
-      print("🔐 Current permission status: $permissionGranted");
+      print("🔐 Location package: Permission status: $permissionGranted");
     } catch (e) {
-      print("❌ Error checking permission: $e");
-      if (e.toString().contains('MissingPluginException')) {
-        print("🚫 Location plugin not available in release mode");
-        return _getFallbackLocationData();
-      }
-      return _getFallbackLocationData();
+      print("❌ Location package: Error checking permission: $e");
+      return null;
     }
 
-    // Step 4: If permission denied, request it natively
+    // Request permission if needed
     if (permissionGranted == loc.PermissionStatus.denied) {
-      print("⚠️ Location permission denied, requesting natively...");
       try {
+        print("🔧 DEBUG: Requesting Location package permission...");
         permissionGranted = await location.requestPermission();
-        print("📱 Native permission request result: $permissionGranted");
-      } catch (e) {
-        print("❌ Error requesting permission: $e");
-        if (e.toString().contains('MissingPluginException')) {
-          print("🚫 Location plugin not available in release mode");
-          return _getFallbackLocationData();
+        print(
+            "🔧 DEBUG: Location package permission after request: $permissionGranted");
+        if (permissionGranted != loc.PermissionStatus.granted &&
+            permissionGranted != loc.PermissionStatus.grantedLimited) {
+          print("❌ Location package: Permission not granted");
+          return null;
         }
-        return _getFallbackLocationData();
+      } catch (e) {
+        print("❌ Location package: Error requesting permission: $e");
+        return null;
       }
     }
 
-    // Step 5: Check final permission status
-    bool finalPermissionGranted =
-        (permissionGranted == loc.PermissionStatus.granted ||
-            permissionGranted == loc.PermissionStatus.grantedLimited);
+    print("✅ Location package: Permissions granted, getting position...");
 
-    if (!finalPermissionGranted) {
-      print("❌ Location permissions are denied by user: $permissionGranted");
-      if (permissionGranted == loc.PermissionStatus.deniedForever) {
-        print("🚫 Location permissions are permanently denied");
-        // Note: We can't open app settings without geolocator, so just return fallback
-      }
-      return _getFallbackLocationData();
-    }
-
-    // Step 6: Get current position using location package
-    print("✅ Permissions granted, getting current position...");
+    // Get location with timeout and proper error handling
     try {
-      loc.LocationData locationData = await location.getLocation();
-      print(
-          "📍 Position obtained: ${locationData.latitude}, ${locationData.longitude}");
-      return locationData;
-    } catch (e) {
-      print("❌ Error getting current position: $e");
-      if (e.toString().contains('MissingPluginException')) {
-        print("🚫 Location plugin not available in release mode");
-        return _getFallbackLocationData();
+      await location.changeSettings(
+        accuracy: loc.LocationAccuracy.high,
+        interval: 1000,
+        distanceFilter: 0,
+      );
+
+      loc.LocationData locationData = await location.getLocation().timeout(
+        const Duration(seconds: 15), // Timeout to prevent hanging
+        onTimeout: () {
+          throw Exception("Location package timeout");
+        },
+      );
+
+      if (locationData.latitude != null &&
+          locationData.longitude != null &&
+          locationData.latitude != 0.0 &&
+          locationData.longitude != 0.0) {
+        log('locationData------------------${locationData.latitude}------${locationData.longitude}');
+        print(
+            "📍 Location package SUCCESS: ${locationData.latitude}, ${locationData.longitude}");
+        return locationData;
+      } else {
+        print("❌ Location package: Invalid coordinates received");
+        return null;
       }
-      return _getFallbackLocationData();
+    } catch (e) {
+      print("❌ Location package: Error getting position: $e");
+      return null;
     }
   } catch (e) {
-    print("❌ Unexpected error in determinePosition: $e");
-    return _getFallbackLocationData();
+    print("❌ Location package: Unexpected error: $e");
+    return null;
   }
 }
 
-/// Returns fallback coordinates for Muscat, Oman when location services fail
-loc.LocationData _getFallbackLocationData() {
-  print("🏠 Using fallback coordinates: Muscat, Oman (23.5859, 58.4059)");
-  return loc.LocationData.fromMap({
-    'latitude': 23.5859,
-    'longitude': 58.4059,
-    'accuracy': 0.0,
-    'altitude': 0.0,
-    'heading': 0.0,
-    'speed': 0.0,
-    'time': DateTime.now().millisecondsSinceEpoch.toDouble(),
-  });
-}
-
-Future<void> getServiceMan(BuildContext context, id, homeservice) async {
+Future<void> getServiceMan(BuildContext context, int? id, Services homeservice,
+    {loc.LocationData? providedLocation}) async {
+  // await determinePosition();
+  log('getServiceMan ----------------------1');
   //  final otpProvider = Provider.of<OTPProvider>(context, listen: false);
   final provider = Provider.of<DataProvider>(context, listen: false);
   final userDetails = provider.viewProfileModel?.userdetails;
+  log('getServiceMan ----------------------2');
   final String lanId = Hive.box("LocalLan").get('lang_id');
+  log('getServiceMan ----------------------3');
   // provider.subServicesModel = null;
   String? apiToken = Hive.box("token").get('api_token');
+  log('getServiceMan ----------------------4');
   // if (apiToken == null) return;
   if (apiToken == null) {
+    log('getServiceMan ----------------------5');
     apiToken = '';
+    log('getServiceMan ----------------------6');
   }
   try {
+    // Use provided location if available, otherwise determine position
     loc.LocationData? locationData = await determinePosition();
+    if (locationData == null) {
+      locationData = await determinePosition();
+      if (locationData == null) {
+        locationData = providedLocation;
+      }
+    }
+    log('getServiceMan ----------------------${locationData?.latitude} - ${locationData?.longitude}');
     log('user details -------- ${userDetails?.latitude}');
 
-    double latitude = 23.5859; // Default fallback coordinates (Muscat, Oman)
-    double longitude = 58.4059;
+    double latitude = locationData?.latitude ??
+        23.5859; // Default fallback coordinates (Muscat, Oman)
+    double longitude = locationData?.longitude ?? 58.4059;
 
     // Step 4: Try to get current position if everything is available
     try {
       if (locationData != null) {
-        latitude = locationData.latitude ?? 23.5859;
-        longitude = locationData.longitude ?? 58.4059;
         log('position-------_${latitude}------${longitude}');
         userDetails?.latitude = latitude.toString();
         userDetails?.longitude = longitude.toString();
@@ -183,7 +209,6 @@ Future<void> getServiceMan(BuildContext context, id, homeservice) async {
       log('getServiceMan------------>> ${response.body}------${response.request}');
       print("Navigation active");
 
-      navToServiceMan(context, id, homeservice, locationData);
       if (jsonResponse['result'] == false) {
         await Hive.box("token").clear();
         return;
@@ -191,6 +216,11 @@ Future<void> getServiceMan(BuildContext context, id, homeservice) async {
 
       final serviceManListData = ServiceManListModel.fromJson(jsonResponse);
       provider.getServiceManData(serviceManListData);
+
+      // Navigate to ServicerPage after successful API response
+      log('navToServiceMan ----------------------1');
+      navToServiceMan(context, id, homeservice, locationData);
+      log('navToServiceMan ----------------------2');
       // if (provider.serviceManListModel?.serviceman?.isEmpty ?? false) {
       //   showAnimatedSnackBar(context, "No ServiceMan Available");
       // }

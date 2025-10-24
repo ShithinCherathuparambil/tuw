@@ -65,7 +65,8 @@ android {
         // Handle receiver export requirements for API 34+
         manifestPlaceholders = [
             'receiverExported': 'false',
-            'applicationName': 'io.flutter.app.FlutterApplication'
+            'applicationName': 'io.flutter.app.FlutterApplication',
+            'MAPS_API_KEY': 'AIzaSyATbPpXTjnk535Ntl9H-2CuVk_An46zPQ0'
         ]
 
         // Support for 16KB page size (required for Google Play from Nov 2025)
@@ -109,4 +110,7 @@ dependencies {
 
     // AppCompat for location package theme support
     implementation 'androidx.appcompat:appcompat:1.7.0'
+
+    // Google Play Services for SMS Retriever API (Google Play Protect compliant)
+    implementation 'com.google.android.gms:play-services-auth-api-phone:18.0.1'
 }
