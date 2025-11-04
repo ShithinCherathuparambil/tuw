@@ -4,6 +4,9 @@
     <!-- Minimum screen size support -->
     <supports-screens android:requiresSmallestWidthDp="320" />
 
+    <!-- 16KB page size support for Google Play compliance -->
+    <uses-feature android:name="android.software.activities_on_secondary_displays" android:required="false" />
+
     <!-- Essential Permissions for Service App -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
