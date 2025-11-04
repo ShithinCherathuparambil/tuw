@@ -15,7 +15,6 @@ let package = Package(
         .library(name: "FlutterGeneratedPluginSwiftPackage", type: .static, targets: ["FlutterGeneratedPluginSwiftPackage"])
     ],
     dependencies: [
-        .package(name: "video_player_avfoundation", path: "../.packages/video_player_avfoundation"),
         .package(name: "device_info_plus", path: "../.packages/device_info_plus"),
         .package(name: "webview_flutter_wkwebview", path: "../.packages/webview_flutter_wkwebview"),
         .package(name: "shared_preferences_foundation", path: "../.packages/shared_preferences_foundation"),
@@ -32,7 +31,6 @@ let package = Package(
         .target(
             name: "FlutterGeneratedPluginSwiftPackage",
             dependencies: [
-                .product(name: "video-player-avfoundation", package: "video_player_avfoundation"),
                 .product(name: "device-info-plus", package: "device_info_plus"),
                 .product(name: "webview-flutter-wkwebview", package: "webview_flutter_wkwebview"),
                 .product(name: "shared-preferences-foundation", package: "shared_preferences_foundation"),

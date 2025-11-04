@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:lottie/lottie.dart';
+// import 'package:lottie/lottie.dart'; // Removed for size optimization
 import 'package:tuw_services/API/address/deleteUserAddress.dart';
 import 'package:tuw_services/API/viewProfile.dart';
 import 'package:tuw_services/components/routes_manager.dart';
@@ -39,7 +39,7 @@ class _DialogueBoxState extends State<DialogueBox> {
             SizedBox(height: MediaQuery.of(context).size.height / 65),
             SizedBox(
                 height: MediaQuery.of(context).size.height / 5,
-                child: LottieBuilder.asset("assets/delete_bin2.json")),
+                child: Icon(Icons.delete_forever, size: 80, color: Colors.red)),
             Text(
               "${str.di_delete2} \n${str.di_delete3}",
               textAlign: TextAlign.center,

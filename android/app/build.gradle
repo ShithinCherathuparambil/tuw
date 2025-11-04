@@ -82,6 +82,19 @@ android {
         }
     }
 
+    // Bundle configuration for size optimization
+    bundle {
+        language {
+            enableSplit = true
+        }
+        density {
+            enableSplit = true
+        }
+        abi {
+            enableSplit = true
+        }
+    }
+
     signingConfigs {
         release {
             if (keystorePropertiesFile.exists()) {
@@ -99,6 +112,18 @@ buildTypes {
         minifyEnabled true
         proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         signingConfig signingConfigs.release
+
+        // Enhanced size optimization
+        zipAlignEnabled true
+        debuggable false
+        jniDebuggable false
+        renderscriptDebuggable false
+        pseudoLocalesEnabled false
+
+        // Additional optimization flags
+        manifestPlaceholders += [
+            'enableCrashlytics': 'false'
+        ]
     }
 }
 }

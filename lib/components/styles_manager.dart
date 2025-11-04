@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 TextStyle _getTextStyle(double fontSize, Color color, FontWeight fontWeight) {
-  return GoogleFonts.robotoSlab(
+  return TextStyle(
+    fontFamily: 'Roboto', // Using system font instead of Google Fonts
     fontSize: fontSize,
     color: color,
     fontWeight: fontWeight,

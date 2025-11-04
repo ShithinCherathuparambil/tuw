@@ -45,7 +45,7 @@ import '../l10n/app_localizations.dart';
 import 'package:http/http.dart' as http;
 import 'package:async/async.dart';
 import 'package:record/record.dart';
-import 'package:video_compress/video_compress.dart';
+// import 'package:video_compress/video_compress.dart'; // Removed for size optimization
 // import 'package:video_compress/video_compress.dart' as video_compress;
 
 class ChatScreen extends StatefulWidget {
@@ -1197,21 +1197,18 @@ class _ChatScreenState extends State<ChatScreen> {
       var videoFile = videoFiles[0];
       var tempFile = File(videoFile.path);
 
-      var compressedVideo = await VideoCompress.compressVideo(
-        tempFile.path,
-        quality: VideoQuality.DefaultQuality,
-        deleteOrigin: false,
-      );
+      // Video compression removed for size optimization
+      // Use original video file directly
+      var compressedVideo = tempFile;
 
-      if (compressedVideo == null ||
-          !File(compressedVideo.path!).existsSync()) {
-        print('Error compressing video');
+      if (!compressedVideo.existsSync()) {
+        print('Error: Video file does not exist');
         return;
       }
 
       var stream = http.ByteStream(
-          DelegatingStream(File(compressedVideo.path!).openRead()));
-      var length = await File(compressedVideo.path!).length();
+          DelegatingStream(File(compressedVideo.path).openRead()));
+      var length = await File(compressedVideo.path).length();
 
       final apiToken = Hive.box("token").get('api_token');
 
@@ -1223,7 +1220,7 @@ class _ChatScreenState extends State<ChatScreen> {
         'file',
         stream,
         length,
-        filename: compressedVideo.path!.split('/').last,
+        filename: compressedVideo.path.split('/').last,
       );
       request.files.add(multipartFile);
 

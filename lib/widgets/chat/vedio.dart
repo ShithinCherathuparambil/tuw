@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:video_player/video_player.dart';
+// import 'package:video_player/video_player.dart'; // Removed for size optimization
 
 class VideoPlayerScreen extends StatefulWidget {
   final String videoUrl;
@@ -11,26 +11,7 @@ class VideoPlayerScreen extends StatefulWidget {
 }
 
 class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
-  late VideoPlayerController _controller;
-  late Future<void> _initializeVideoPlayerFuture;
-
-  @override
-  void initState() {
-    super.initState();
-    _initializeVideoPlayer();
-  }
-
-  void _initializeVideoPlayer() {
-    // ignore: deprecated_member_use
-    _controller = VideoPlayerController.network(widget.videoUrl);
-    _initializeVideoPlayerFuture = _controller.initialize().then((_) {
-      setState(() {});
-    }).catchError((error) {
-      print("Error initializing video: $error");
-    });
-    _controller.setLooping(true);
-    _controller.play();
-  }
+  // Video player removed for size optimization
 
   @override
   Widget build(BuildContext context) {
@@ -45,33 +26,31 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
               icon: Icon(Icons.cancel))
         ],
       ),
-      body: FutureBuilder(
-        future: _initializeVideoPlayerFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            return Container(
-              width: double.infinity,
-              child: AspectRatio(
-                aspectRatio: _controller.value.aspectRatio,
-                child: VideoPlayer(_controller),
-              ),
-            );
-          } else if (snapshot.hasError) {
-            return Center(
-              child: Text('Error loading video: ${snapshot.error}'),
-            );
-          } else {
-            return Center(child: CircularProgressIndicator());
-          }
-        },
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.video_library,
+              size: 100,
+              color: Colors.grey,
+            ),
+            SizedBox(height: 20),
+            Text(
+              'Video Player Removed for Size Optimization',
+              style: TextStyle(fontSize: 16, color: Colors.grey),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: 10),
+            Text(
+              'Video URL: ${widget.videoUrl}',
+              style: TextStyle(fontSize: 12, color: Colors.grey),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    _controller.dispose();
   }
 }
 
@@ -85,45 +64,26 @@ class VideoPlayerWidget extends StatefulWidget {
 }
 
 class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
-  late VideoPlayerController _controller;
-  late Future<void> _initializeVideoPlayerFuture;
-
-  @override
-  void initState() {
-  
-    super.initState();
-    // ignore: deprecated_member_use
-    _controller = VideoPlayerController.network(widget.videoUrl);
-
-     _initializeVideoPlayerFuture = _controller.initialize();
-    // _controller.setLooping(true); // Enable looping if needed
-    // _controller.play(); // Start playing the video automatically
-  }
-
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: _initializeVideoPlayerFuture,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.done) {
-          return AspectRatio(
-            aspectRatio: _controller.value.aspectRatio,
-            child: VideoPlayer(_controller,),
-          );
-        } else if (snapshot.hasError) {
-          return Center(
-            child: Text('Error loading video'),
-          );
-        } else {
-          return Center(child: CircularProgressIndicator());
-        }
-      },
+    return Container(
+      height: 200,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.video_library,
+            size: 60,
+            color: Colors.grey,
+          ),
+          SizedBox(height: 10),
+          Text(
+            'Video Player Removed for Size Optimization',
+            style: TextStyle(fontSize: 12, color: Colors.grey),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
     );
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    _controller.dispose();
   }
 }

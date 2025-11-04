@@ -4,7 +4,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:hive/hive.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:lottie/lottie.dart';
+// import 'package:lottie/lottie.dart'; // Removed for size optimization
 import 'package:provider/provider.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:tuw_services/providers/data_provider.dart';
@@ -58,7 +58,7 @@ class _PaymentFailurePageState extends State<PaymentFailurePage> {
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<DataProvider>(context, listen: true);
-   
+
     final size = MediaQuery.of(context).size;
     final str = AppLocalizations.of(context)!;
     final w = MediaQuery.of(context).size.width;
@@ -114,36 +114,43 @@ class _PaymentFailurePageState extends State<PaymentFailurePage> {
                 ),
                 GButton(
                   icon: FontAwesomeIcons.message,
-                  leading: Stack(
-                      children: [InkWell(
-                        child: SizedBox(
-                            width: 24,
-                            height: 24,
-                            child: SvgPicture.asset(ImageAssets.chatIconSvg)),
-         
-             ),  Positioned(
-        right: 0,top: 0,
-        child: new Container(
-          padding: EdgeInsets.all(1),
-          decoration: new BoxDecoration(
-            color: Colors.red,
-            borderRadius: BorderRadius.circular(6),
-          ),
-          constraints: BoxConstraints(
-            minWidth: 15,
-            minHeight: 15,
-          ),
-          child:Text(provider.chatListDetails!.chatMessage!.data!.isNotEmpty? 
-              provider.chatListDetails!.chatMessage!.data![0].unreadCount.toString()
-             :'0',
-             style: new TextStyle(
-              color: Colors.white,
-              fontSize: 11,
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ),
-      ) ]),    ),
+                  leading: Stack(children: [
+                    InkWell(
+                      child: SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: SvgPicture.asset(ImageAssets.chatIconSvg)),
+                    ),
+                    Positioned(
+                      right: 0,
+                      top: 0,
+                      child: new Container(
+                        padding: EdgeInsets.all(1),
+                        decoration: new BoxDecoration(
+                          color: Colors.red,
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        constraints: BoxConstraints(
+                          minWidth: 15,
+                          minHeight: 15,
+                        ),
+                        child: Text(
+                          provider.chatListDetails!.chatMessage!.data!
+                                  .isNotEmpty
+                              ? provider.chatListDetails!.chatMessage!.data![0]
+                                  .unreadCount
+                                  .toString()
+                              : '0',
+                          style: new TextStyle(
+                            color: Colors.white,
+                            fontSize: 11,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    )
+                  ]),
+                ),
               ],
               haptic: true,
               selectedIndex: _selectedIndex,
@@ -209,10 +216,12 @@ class _PaymentFailurePageState extends State<PaymentFailurePage> {
                                   child: Stack(
                                     alignment: AlignmentDirectional.center,
                                     children: [
-                                      LottieBuilder.asset(
-                                        // fit: BoxFit.fitWidth,
-                                        ImageAssets.paymentFailure,
-                                        repeat: false,
+                                      // Replaced Lottie with static image for size optimization
+                                      Image.asset(
+                                        'assets/images/payment_failed.png', // Use static image instead
+                                        height: 200,
+                                        width: 200,
+                                        fit: BoxFit.contain,
                                       ),
                                     ],
                                   ),

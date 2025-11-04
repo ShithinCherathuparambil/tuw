@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'color_manager.dart';
 import 'styles_manager.dart';
@@ -11,7 +10,7 @@ ThemeData getApplicationTheme(BuildContext context) {
         iconTheme: IconThemeData(color: ColorManager.primary, size: 30),
       ),
       visualDensity: VisualDensity.adaptivePlatformDensity,
-      fontFamily: GoogleFonts.lexendDeca().fontFamily,
+      fontFamily: 'Roboto', // Using system font instead of Google Fonts
       scaffoldBackgroundColor: ColorManager.background,
       primaryColor: ColorManager.primary,
       // colorScheme: const ColorScheme.dark(
